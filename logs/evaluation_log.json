@@ -1,0 +1,19 @@
+[
+  {
+    "run": 1,
+    "timestamp": "2026-05-06 20:35:17",
+    "commit": "44ad25e",
+    "changes": "Improve content-based model: TF-IDF tuning and cosine similarity scoring",
+    "users_evaluated": 30,
+    "scores": {
+      "precision_at_10": 0.1867,
+      "recall_at_10": 0.0107,
+      "ndcg_at_10": 0.2059
+    },
+    "improvement_vs_previous": {
+      "precision_pct": null,
+      "recall_pct": null,
+      "ndcg_pct": null
+    }
+  }
+]

@@ -1,6 +1,7 @@
 import math
 import random
 import pandas as pd
+from logger import log_run
 
 
 # -----------------------------
@@ -173,3 +174,5 @@ if __name__ == "__main__":
     print(f"\n🎯 Final Precision@10 : {precision:.4f}")
     print(f"🎯 Final Recall@10    : {recall:.4f}")
     print(f"🎯 Final NDCG@10      : {ndcg:.4f}")
+
+    log_run(precision, recall, ndcg, n_users=30)
