@@ -27,43 +27,49 @@ class HybridRecommender:
     # -----------------------------
     def recommend(self, user_id, movie_name, top_n=10):
 
-        # STEP 1: Get all movies
+        # Cold-start: unknown user → pure content-based
+        if user_id not in self.collab_model.model.user_map:
+            return self.content_model.recommend(movie_name, top_n=top_n)
+
+        # STEP 1: Batch SVD predictions — only returns movies the model knows
+        svd_scores = self.collab_model.model.predict_for_user(user_id)
+
+        # Normalise ONLY over SVD-known movies so unknown movies don't contaminate
+        # the score range. Unknown movies get 0.0 base (below all SVD predictions).
+        if svd_scores:
+            min_s = min(svd_scores.values())
+            max_s = max(svd_scores.values())
+            score_range = max_s - min_s or 1.0
+            norm_svd = {mid: (s - min_s) / score_range for mid, s in svd_scores.items()}
+        else:
+            norm_svd = {}
+
         all_movie_ids = self.movies['movieId'].values
+        # Known movies → normalised SVD score  |  Unknown → 0.0
+        base_scores = {mid: norm_svd.get(mid, 0.0) for mid in all_movie_ids}
 
-        # STEP 2: SVD ranking (PRIMARY SIGNAL)
-        scores = {}
-
-        for movie_id in all_movie_ids:
-            pred = self.collab_model.model.predict(user_id, movie_id)
-            scores[movie_id] = pred.est
-
-        # STEP 3: Get content-based similar movies (BOOST SET)
-        content_results = self.content_model.recommend(movie_name, top_n=50)
-
-        content_set = set()
-
-        for title in content_results:
+        # STEP 2: Graded content scores — rank 0 → 1.0, rank 99 → 0.01
+        content_results = self.content_model.recommend(movie_name, top_n=100)
+        content_grades = {}
+        for rank, title in enumerate(content_results):
             mid = self.get_movie_id(title)
             if mid:
-                content_set.add(mid)
+                content_grades[mid] = (100 - rank) / 100
 
-        # STEP 4: Apply hybrid boost
-        final_scores = {}
+        # STEP 3: Weighted additive fusion  (SVD 70% + content 30%)
+        # SVD-known movies score up to 0.7 + 0.3 = 1.0
+        # Content-only unknowns score up to 0.0 + 0.3 = 0.3  (below SVD top movies)
+        alpha, beta = 0.7, 0.3
+        final_scores = {
+            mid: alpha * base_scores[mid] + beta * content_grades.get(mid, 0.0)
+            for mid in all_movie_ids
+        }
 
-        for movie_id, score in scores.items():
-
-            boost = 1.2 if movie_id in content_set else 1.0
-            final_scores[movie_id] = score * boost
-
-        # STEP 5: Sort final results
+        # STEP 4: Sort and return top-N titles
         sorted_movies = sorted(final_scores.items(), key=lambda x: x[1], reverse=True)
-
-        # STEP 6: Convert to titles
         recommendations = []
-
         for movie_id, _ in sorted_movies[:top_n]:
             title = self.get_title(movie_id)
             if title:
                 recommendations.append(title)
-
         return recommendations
