@@ -512,5 +512,5 @@ You are free to use, copy, modify, merge, publish, distribute, sublicense, and s
 <div align="center">
   <p>Built with passion for data, film, and open-source.</p>
   <p>⭐ Star this repo if you found it useful!</p>
-  <p><strong>© 2024 Aman Asgola. MIT Licensed.</strong></p>
+  <p><strong>© 2026 Aman Asgola. MIT Licensed.</strong></p>
 </div>
