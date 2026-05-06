@@ -1,14 +1,35 @@
+import math
+import random
 import pandas as pd
-from collections import defaultdict
 
 
 # -----------------------------
-# Precision@K
+# Precision@K  (standard: hits / k)
 # -----------------------------
 def precision_at_k(recommended, relevant, k=10):
-    recommended_k = recommended[:k]
-    hits = len(set(recommended_k) & set(relevant))
-    return hits / min(k, len(relevant)) if relevant else 0
+    hits = len(set(recommended[:k]) & set(relevant))
+    return hits / k if k > 0 else 0
+
+
+# -----------------------------
+# Recall@K
+# -----------------------------
+def recall_at_k(recommended, relevant, k=10):
+    hits = len(set(recommended[:k]) & set(relevant))
+    return hits / len(relevant) if relevant else 0
+
+
+# -----------------------------
+# NDCG@K
+# -----------------------------
+def ndcg_at_k(recommended, relevant, k=10):
+    relevant_set = set(relevant)
+    dcg = sum(
+        1.0 / math.log2(i + 2)
+        for i, mid in enumerate(recommended[:k]) if mid in relevant_set
+    )
+    ideal = sum(1.0 / math.log2(i + 2) for i in range(min(k, len(relevant))))
+    return dcg / ideal if ideal > 0 else 0
 
 
 # -----------------------------
@@ -35,12 +56,26 @@ def get_movie_id_by_title(movies, title):
 # -----------------------------
 # Evaluate Hybrid Model (FIXED)
 # -----------------------------
-def evaluate_model(hybrid_model, ratings, movies, sample_users=5, k=10):
+def evaluate_model(hybrid_model, ratings, movies, sample_users=20, k=10):
 
     user_likes = get_user_relevant_movies(ratings)
-    precisions = []
 
-    users = list(user_likes.keys())[:sample_users]
+    # Only evaluate users the SVD model was trained on — otherwise predictions degrade
+    # to global mean and scores become meaningless.
+    known_users = set(hybrid_model.collab_model.model.user_map.keys())
+    # Require ≥20 liked movies so the 50% train split gives ≥10 training examples.
+    # Sparse users (2-6 liked movies) produce unreliable SVD vectors and inflate 0.00 scores.
+    eligible = [u for u, liked in user_likes.items()
+                if len(liked) >= 20 and u in known_users]
+
+    if not eligible:
+        print("⚠️  No known users found — increase training sample in collaborative.py")
+        return 0, 0, 0
+
+    random.seed(42)
+    users = random.sample(eligible, min(sample_users, len(eligible)))
+
+    precisions, recalls, ndcgs = [], [], []
 
     for user_id in users:
 
@@ -48,34 +83,22 @@ def evaluate_model(hybrid_model, ratings, movies, sample_users=5, k=10):
 
         liked_movies = user_likes[user_id]
 
-        if len(liked_movies) < 4:
-            print("Skipped: not enough data")
-            continue
-
-        # 🔥 TRAIN-TEST SPLIT
         split = len(liked_movies) // 2
         train_movies = liked_movies[:split]
         test_movies = liked_movies[split:]
 
-        print("Train size:", len(train_movies), "| Test size:", len(test_movies))
+        print(f"Train size: {len(train_movies)} | Test size: {len(test_movies)}")
 
         all_recommendations = []
 
-        # Use multiple training movies as input
-        for movie_id in train_movies[:3]:
-
+        for movie_id in train_movies[:5]:
             movie_row = movies[movies['movieId'] == movie_id]
-
             if movie_row.empty:
                 continue
-
             movie_title = movie_row.iloc[0]['title']
-
             print("Input movie:", movie_title)
-
             try:
                 recs = hybrid_model.recommend(user_id, movie_title, top_n=k)
-                print("Recs:", recs)
                 all_recommendations.extend(recs)
             except Exception as e:
                 print("Error:", e)
@@ -83,28 +106,43 @@ def evaluate_model(hybrid_model, ratings, movies, sample_users=5, k=10):
 
         # Convert recommended titles → movieIds
         rec_ids = []
-
         for title in all_recommendations:
             movie_id = get_movie_id_by_title(movies, title)
             if movie_id:
                 rec_ids.append(movie_id)
 
-        if len(rec_ids) == 0:
+        if not rec_ids:
             print("No valid recommendations")
             continue
 
-        precision = precision_at_k(rec_ids, test_movies, k)
-        print("Precision:", precision)
+        # deduplicate preserving rank order so Precision@10 sees distinct movies
+        seen = set()
+        unique_rec_ids = []
+        for mid in rec_ids:
+            if mid not in seen:
+                seen.add(mid)
+                unique_rec_ids.append(mid)
+        rec_ids = unique_rec_ids
 
-        precisions.append(precision)
+        p = precision_at_k(rec_ids, test_movies, k)
+        r = recall_at_k(rec_ids, test_movies, k)
+        n = ndcg_at_k(rec_ids, test_movies, k)
+        print(f"  Precision@{k}: {p:.4f}  Recall@{k}: {r:.4f}  NDCG@{k}: {n:.4f}")
 
-    if len(precisions) == 0:
+        precisions.append(p)
+        recalls.append(r)
+        ndcgs.append(n)
+
+    if not precisions:
         print("\n❌ No valid evaluations done")
-        return 0
+        return 0, 0, 0
 
-    print("\nAll precision scores:", precisions)
+    avg_p = sum(precisions) / len(precisions)
+    avg_r = sum(recalls) / len(recalls)
+    avg_n = sum(ndcgs) / len(ndcgs)
 
-    return sum(precisions) / len(precisions)
+    print(f"\nEvaluated {len(precisions)} users")
+    return avg_p, avg_r, avg_n
 
 
 # -----------------------------
@@ -130,9 +168,8 @@ if __name__ == "__main__":
     print(hybrid_model.recommend(1, "Toy Story", top_n=5))
 
     # evaluation
-    score = evaluate_model(hybrid_model, ratings, movies, sample_users=5, k=10)
+    precision, recall, ndcg = evaluate_model(hybrid_model, ratings, movies, sample_users=30, k=10)
 
-    print(f"\n🎯 Final Precision@10: {score:.4f}")
-    # print(collab_model.model.predict(1, 1))
-    # print(collab_model.model.predict(1, 10))
-    # print(collab_model.model.predict(2, 10))
+    print(f"\n🎯 Final Precision@10 : {precision:.4f}")
+    print(f"🎯 Final Recall@10    : {recall:.4f}")
+    print(f"🎯 Final NDCG@10      : {ndcg:.4f}")

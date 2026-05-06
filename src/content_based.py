@@ -25,14 +25,22 @@ class ContentBasedRecommender:
             .str.strip()
         )
 
-        # Combine features (better than genres alone) but Not better 
-        self.movies['features'] = self.movies['genres'].fillna('')
-
+        # genres (pipe → space) + title words for richer similarity signal
+        self.movies['features'] = (
+            self.movies['genres'].fillna('').str.replace('|', ' ', regex=False)
+            + ' '
+            + self.movies['clean_title'].fillna('')
+        )
 
         # -----------------------------
         # TF-IDF Vectorization
         # -----------------------------
-        self.vectorizer = TfidfVectorizer(stop_words="english")
+        self.vectorizer = TfidfVectorizer(
+            stop_words="english",
+            sublinear_tf=True,
+            ngram_range=(1, 2),
+            min_df=2,
+        )
         self.feature_matrix = self.vectorizer.fit_transform(self.movies['features'])
 
 
