@@ -493,6 +493,14 @@ You are free to use, copy, modify, merge, publish, distribute, sublicense, and s
 
 ---
 
+**UI/UX Designer**
+
+**Shreya Bala**
+
+[![LinkedIn](https://img.shields.io/badge/LinkedIn-Shreya%20Bala-0077B5?style=flat&logo=linkedin&logoColor=white)](https://www.linkedin.com/in/shreya-bala/)
+
+---
+
 *Have a question or suggestion? Open a [GitHub Issue](https://github.com/AmanAsgola/Movie-Recommendation-System/issues) or reach out via LinkedIn.*
 
 ---
