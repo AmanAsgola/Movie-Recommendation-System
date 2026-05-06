@@ -48,13 +48,15 @@ class HybridRecommender:
         # Known movies → normalised SVD score  |  Unknown → 0.0
         base_scores = {mid: norm_svd.get(mid, 0.0) for mid in all_movie_ids}
 
-        # STEP 2: Graded content scores — rank 0 → 1.0, rank 99 → 0.01
-        content_results = self.content_model.recommend(movie_name, top_n=100)
+        # STEP 2: Content scores using actual cosine similarity (not linear rank decay).
+        # A 0.92-similar movie gets grade 0.92; a 0.55-similar movie gets 0.55.
+        # Much more precise than (100-rank)/100 which treats rank-1 and rank-50 the same.
+        content_scored = self.content_model.recommend_scored(movie_name, top_n=150)
         content_grades = {}
-        for rank, title in enumerate(content_results):
+        for title, similarity in content_scored:
             mid = self.get_movie_id(title)
             if mid:
-                content_grades[mid] = (100 - rank) / 100
+                content_grades[mid] = similarity
 
         # STEP 3: Weighted additive fusion  (SVD 70% + content 30%)
         # SVD-known movies score up to 0.7 + 0.3 = 1.0
