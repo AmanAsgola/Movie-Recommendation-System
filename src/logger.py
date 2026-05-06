@@ -97,41 +97,66 @@ def log_run(precision, recall, ndcg, n_users, changes_note=""):
 # Markdown log (full history table)
 # ─────────────────────────────────────────
 def _write_markdown(history):
-    lines = [
-        "# Evaluation Run History\n",
+    def fmt_pct(v):
+        if v is None:
+            return "baseline"
+        sign = "+" if v >= 0 else ""
+        return f"{sign}{v}%"
+
+    lines = ["# Evaluation Run History\n"]
+
+    # ── Summary table ──────────────────────────────────────────
+    lines += [
+        "## Score Summary\n",
         "| Run | Date & Time | Commit | Precision@10 | Recall@10 | NDCG@10 "
-        "| P Δ% | R Δ% | N Δ% | Users | Changes |",
-        "|-----|-------------|--------|-------------|-----------|---------|"
-        "------|------|------|-------|---------|",
+        "| P Δ% | R Δ% | N Δ% | Users |",
+        "|-----|-------------|--------|:-----------:|:---------:|:-------:|"
+        ":----:|:----:|:----:|:-----:|",
     ]
 
     for e in history:
         s   = e["scores"]
         imp = e["improvement_vs_previous"]
-
-        def fmt_pct(v):
-            if v is None:
-                return "baseline"
-            sign = "+" if v >= 0 else ""
-            return f"{sign}{v}%"
-
-        row = (
+        lines.append(
             f"| {e['run']} "
             f"| {e['timestamp']} "
             f"| `{e['commit']}` "
-            f"| {s['precision_at_10']:.4f} "
+            f"| **{s['precision_at_10']:.4f}** "
             f"| {s['recall_at_10']:.4f} "
             f"| {s['ndcg_at_10']:.4f} "
             f"| {fmt_pct(imp['precision_pct'])} "
             f"| {fmt_pct(imp['recall_pct'])} "
             f"| {fmt_pct(imp['ndcg_pct'])} "
-            f"| {e['users_evaluated']} "
-            f"| {e['changes'][:80]} |"
+            f"| {e['users_evaluated']} |"
         )
-        lines.append(row)
 
     lines.append("\n")
-    lines.append("---\n")
+
+    # ── Detailed run cards ──────────────────────────────────────
+    lines.append("## Run Details\n")
+
+    for e in history:
+        s   = e["scores"]
+        imp = e["improvement_vs_previous"]
+        note = e.get("note", "")
+
+        lines.append(f"### Run #{e['run']} — {e['timestamp']}\n")
+        lines.append(f"**Commit:** `{e['commit']}`  |  **Users evaluated:** {e['users_evaluated']}\n")
+        lines.append(f"**Changes:** {e['changes']}\n")
+        lines.append(
+            f"| Precision@10 | Recall@10 | NDCG@10 |\n"
+            f"|:---:|:---:|:---:|\n"
+            f"| **{s['precision_at_10']:.4f}** | {s['recall_at_10']:.4f} | {s['ndcg_at_10']:.4f} |\n"
+        )
+        lines.append(
+            f"| Δ Precision | Δ Recall | Δ NDCG |\n"
+            f"|:---:|:---:|:---:|\n"
+            f"| {fmt_pct(imp['precision_pct'])} | {fmt_pct(imp['recall_pct'])} | {fmt_pct(imp['ndcg_pct'])} |\n"
+        )
+        if note:
+            lines.append(f"> **Analysis:** {note}\n")
+        lines.append("---\n")
+
     lines.append(f"_Last updated: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}_\n")
 
     with open(LOG_MD, "w") as f:
