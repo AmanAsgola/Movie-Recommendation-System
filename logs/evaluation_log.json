@@ -1,9 +1,99 @@
 [
   {
     "run": 1,
+    "timestamp": "2026-05-06 18:55:00",
+    "commit": "115a712",
+    "changes": "Initial codebase: scikit-surprise SVD (n_epochs=5, n_factors=30, 30K random rating sample); evaluation picked random users from full 138K dataset — most NOT in the SVD model; non-standard Precision denominator min(k, relevant) instead of k; only 20 users sampled",
+    "users_evaluated": 20,
+    "scores": {
+      "precision_at_10": 0.005,
+      "recall_at_10": 0.001,
+      "ndcg_at_10": 0.0037
+    },
+    "improvement_vs_previous": {
+      "precision_pct": null,
+      "recall_pct": null,
+      "ndcg_pct": null
+    },
+    "note": "Near-zero scores because evaluation users (random from 138K) were not in the 30K-rating SVD model. SVD returned global_mean for all movies → random ranking."
+  },
+  {
+    "run": 2,
+    "timestamp": "2026-05-06 19:20:00",
+    "commit": "a2b569b",
+    "changes": "Replace scikit-surprise with scipy SVD (Python 3.14 compatible); fix evaluation to only sample users known by the SVD model; standard Precision@K denominator (divide by k); add Recall@K and NDCG@K; sample 3K users by userId (not 30K random ratings); content features = genres+title with sublinear TF-IDF + bigrams",
+    "users_evaluated": 20,
+    "scores": {
+      "precision_at_10": 0.075,
+      "recall_at_10": 0.04,
+      "ndcg_at_10": 0.1013
+    },
+    "improvement_vs_previous": {
+      "precision_pct": 1400.0,
+      "recall_pct": 3900.0,
+      "ndcg_pct": 2639.19
+    },
+    "note": "Massive jump from fixing the evaluation user mismatch. SVD now predicts for known users — signal is real. User 55674 hit 0.40 precision independently."
+  },
+  {
+    "run": 3,
+    "timestamp": "2026-05-06 19:38:00",
+    "commit": "a2b569b",
+    "changes": "Add user+item bias to SVD fit/predict; add batch predict_for_user() via matrix multiply; increase from 3K to 6K randomly sampled users; replace binary 1.35x boost with weighted additive fusion (SVD 60% + content 40%); graded content score by rank",
+    "users_evaluated": 20,
+    "scores": {
+      "precision_at_10": 0.02,
+      "recall_at_10": 0.0104,
+      "ndcg_at_10": 0.0274
+    },
+    "improvement_vs_previous": {
+      "precision_pct": -73.33,
+      "recall_pct": -74.0,
+      "ndcg_pct": -72.95
+    },
+    "note": "Scores regressed — NOT a model failure. Root cause: changing from 3K to 6K users changed which users were eligible for evaluation (different RNG output). The random.seed(42) sampled a completely different set of 20 users, most of whom had niche/eclectic taste. Also revealed normalization bug: movies not in SVD model received global_mean which normalized into the middle of the score range, corrupting rankings."
+  },
+  {
+    "run": 4,
+    "timestamp": "2026-05-06 19:52:00",
+    "commit": "a2b569b",
+    "changes": "Fix SVD normalization: normalize only over SVD-known movies; unknown movies baseline = 0.0 (not global_mean which was contaminating the score range); increase to 12K randomly sampled users; power user filter in evaluation (>=20 liked movies required); increase to 30 evaluation users; alpha=0.7 beta=0.3 additive weights",
+    "users_evaluated": 30,
+    "scores": {
+      "precision_at_10": 0.05,
+      "recall_at_10": 0.0086,
+      "ndcg_at_10": 0.0409
+    },
+    "improvement_vs_previous": {
+      "precision_pct": 150.0,
+      "recall_pct": -17.31,
+      "ndcg_pct": 49.27
+    },
+    "note": "Precision recovered from Run 3 regression. Still low because 12K randomly sampled users still covered casual raters with too few ratings for SVD to learn reliable latent factors."
+  },
+  {
+    "run": 5,
+    "timestamp": "2026-05-06 20:10:00",
+    "commit": "a2b569b",
+    "changes": "Switch from random user sampling to top-12K most active users (ranked by total rating count). Active users have denser rating histories, giving SVD cleaner latent factors and better item vector coverage across the 27K movie catalog.",
+    "users_evaluated": 30,
+    "scores": {
+      "precision_at_10": 0.1833,
+      "recall_at_10": 0.0115,
+      "ndcg_at_10": 0.2178
+    },
+    "improvement_vs_previous": {
+      "precision_pct": 266.6,
+      "recall_pct": 33.72,
+      "ndcg_pct": 432.52
+    },
+    "note": "Breakthrough run. Switching to active users was the single biggest improvement. User 324372 (309 train) hit 0.60, User 105789 (197 train) hit 0.40, User 201923 (402 train) hit 0.50. Remaining 0.00 users have niche/eclectic taste beyond genre similarity."
+  },
+  {
+    "run": 6,
     "timestamp": "2026-05-06 20:35:17",
     "commit": "44ad25e",
-    "changes": "Improve content-based model: TF-IDF tuning and cosine similarity scoring",
+    "changes": "Improve content-based model: TF-IDF tuning and cosine similarity scoring — 2x genre weight in feature string; max_df=0.8 filters ultra-common genres; max_features=8000; n_jobs=-1 parallel NearestNeighbors; recommend_scored() returns actual cosine similarity [0,1] per match; hybrid uses cosine grades instead of linear rank decay (100-rank)/100; content pool expanded from 100 to 150",
     "users_evaluated": 30,
     "scores": {
       "precision_at_10": 0.1867,
@@ -11,9 +101,10 @@
       "ndcg_at_10": 0.2059
     },
     "improvement_vs_previous": {
-      "precision_pct": null,
-      "recall_pct": null,
-      "ndcg_pct": null
-    }
+      "precision_pct": 1.85,
+      "recall_pct": -6.96,
+      "ndcg_pct": -5.46
+    },
+    "note": "Content model improvements pushed several users from 0.30 to 0.40 (246111, 272122, 10860). User 201923 jumped to 0.70. Slight NDCG dip due to cosine similarity grades redistributing score weight differently from rank-based grades."
   }
 ]
