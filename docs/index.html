@@ -1,0 +1,1539 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>CineAI — Movie Recommendation System</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@100;200;300;400;500;600;700;800;900&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --purple: #a855f7;
+      --blue: #3b82f6;
+      --pink: #ec4899;
+      --cyan: #06b6d4;
+      --gold: #f59e0b;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      background: #000;
+      color: #fff;
+      overflow-x: hidden;
+    }
+
+    /* ── Canvas background ── */
+    #bg-canvas {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      z-index: 0;
+      pointer-events: none;
+    }
+
+    /* ── Noise overlay ── */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.03'/%3E%3C/svg%3E");
+      pointer-events: none;
+      z-index: 1;
+      opacity: 0.4;
+    }
+
+    /* ── Glassmorphism ── */
+    .glass {
+      background: rgba(255,255,255,0.04);
+      backdrop-filter: blur(24px) saturate(1.8);
+      -webkit-backdrop-filter: blur(24px) saturate(1.8);
+      border: 1px solid rgba(255,255,255,0.08);
+    }
+
+    .glass-strong {
+      background: rgba(255,255,255,0.07);
+      backdrop-filter: blur(40px) saturate(2);
+      -webkit-backdrop-filter: blur(40px) saturate(2);
+      border: 1px solid rgba(255,255,255,0.12);
+    }
+
+    /* ── Gradient text ── */
+    .grad-purple { background: linear-gradient(135deg, #a855f7, #3b82f6); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+    .grad-gold   { background: linear-gradient(135deg, #f59e0b, #ec4899); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+    .grad-cyan   { background: linear-gradient(135deg, #06b6d4, #a855f7); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+    .grad-hero   { background: linear-gradient(135deg, #fff 0%, #a855f7 40%, #3b82f6 70%, #06b6d4 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+
+    /* ── Glow effects ── */
+    .glow-purple { box-shadow: 0 0 60px rgba(168,85,247,0.3), 0 0 120px rgba(168,85,247,0.1); }
+    .glow-blue   { box-shadow: 0 0 60px rgba(59,130,246,0.3), 0 0 120px rgba(59,130,246,0.1); }
+    .glow-text   { text-shadow: 0 0 40px rgba(168,85,247,0.6); }
+
+    /* ── Nav ── */
+    nav {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      z-index: 1000;
+      padding: 16px 48px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: rgba(0,0,0,0.4);
+      backdrop-filter: blur(20px);
+      border-bottom: 1px solid rgba(255,255,255,0.06);
+      transition: all 0.3s ease;
+    }
+
+    nav .logo {
+      font-size: 20px;
+      font-weight: 700;
+      letter-spacing: -0.5px;
+    }
+
+    nav ul {
+      display: flex;
+      gap: 36px;
+      list-style: none;
+    }
+
+    nav ul a {
+      color: rgba(255,255,255,0.6);
+      text-decoration: none;
+      font-size: 14px;
+      font-weight: 400;
+      letter-spacing: 0.01em;
+      transition: color 0.2s;
+    }
+
+    nav ul a:hover { color: #fff; }
+
+    .nav-cta {
+      background: linear-gradient(135deg, #a855f7, #3b82f6);
+      color: #fff !important;
+      padding: 8px 20px;
+      border-radius: 980px;
+      font-weight: 500 !important;
+      font-size: 13px !important;
+    }
+
+    /* ── Sections ── */
+    section { position: relative; z-index: 2; }
+
+    /* ── Hero ── */
+    .hero {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 120px 24px 80px;
+    }
+
+    .hero-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 6px 16px;
+      border-radius: 980px;
+      background: rgba(168,85,247,0.12);
+      border: 1px solid rgba(168,85,247,0.3);
+      font-size: 13px;
+      font-weight: 500;
+      color: #a855f7;
+      margin-bottom: 32px;
+      letter-spacing: 0.02em;
+    }
+
+    .hero h1 {
+      font-size: clamp(52px, 8vw, 112px);
+      font-weight: 800;
+      line-height: 1.02;
+      letter-spacing: -0.04em;
+      margin-bottom: 28px;
+    }
+
+    .hero p {
+      font-size: clamp(17px, 2vw, 22px);
+      color: rgba(255,255,255,0.55);
+      max-width: 680px;
+      line-height: 1.65;
+      margin-bottom: 52px;
+      font-weight: 300;
+    }
+
+    .hero-btns {
+      display: flex;
+      gap: 16px;
+      flex-wrap: wrap;
+      justify-content: center;
+      margin-bottom: 80px;
+    }
+
+    .btn-primary {
+      padding: 16px 36px;
+      border-radius: 980px;
+      background: linear-gradient(135deg, #a855f7, #3b82f6);
+      color: #fff;
+      font-size: 16px;
+      font-weight: 600;
+      text-decoration: none;
+      transition: transform 0.2s, box-shadow 0.2s;
+      display: inline-block;
+    }
+
+    .btn-primary:hover {
+      transform: scale(1.04);
+      box-shadow: 0 8px 40px rgba(168,85,247,0.5);
+    }
+
+    .btn-secondary {
+      padding: 15px 36px;
+      border-radius: 980px;
+      background: transparent;
+      border: 1px solid rgba(255,255,255,0.2);
+      color: #fff;
+      font-size: 16px;
+      font-weight: 500;
+      text-decoration: none;
+      transition: all 0.2s;
+      display: inline-block;
+    }
+
+    .btn-secondary:hover {
+      background: rgba(255,255,255,0.07);
+      border-color: rgba(255,255,255,0.4);
+    }
+
+    /* ── 3D Movie Cards ── */
+    .movie-3d-scene {
+      perspective: 1200px;
+      width: 100%;
+      max-width: 900px;
+      height: 320px;
+      position: relative;
+      margin: 0 auto;
+    }
+
+    .movie-card-3d {
+      position: absolute;
+      width: 140px;
+      height: 210px;
+      border-radius: 16px;
+      overflow: hidden;
+      transition: transform 0.6s cubic-bezier(0.23,1,0.32,1), box-shadow 0.6s;
+      cursor: pointer;
+      transform-style: preserve-3d;
+    }
+
+    .movie-card-3d:hover {
+      transform: translateY(-20px) scale(1.08) !important;
+      box-shadow: 0 40px 80px rgba(0,0,0,0.7), 0 0 40px rgba(168,85,247,0.4);
+      z-index: 10;
+    }
+
+    .movie-card-3d .poster {
+      width: 100%; height: 100%;
+      background: linear-gradient(135deg, var(--c1), var(--c2));
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-end;
+      padding: 12px;
+      font-size: 11px;
+      font-weight: 600;
+      text-align: center;
+      line-height: 1.3;
+    }
+
+    .movie-icon {
+      font-size: 48px;
+      margin-bottom: 8px;
+    }
+
+    /* ── Stat counters ── */
+    .stat-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+      gap: 1px;
+      background: rgba(255,255,255,0.06);
+      border-radius: 24px;
+      overflow: hidden;
+    }
+
+    .stat-cell {
+      padding: 40px 32px;
+      text-align: center;
+      background: rgba(0,0,0,0.6);
+      transition: background 0.3s;
+    }
+
+    .stat-cell:hover { background: rgba(255,255,255,0.04); }
+
+    .stat-num {
+      font-size: 48px;
+      font-weight: 800;
+      letter-spacing: -0.03em;
+      line-height: 1;
+      margin-bottom: 8px;
+    }
+
+    .stat-label {
+      font-size: 13px;
+      color: rgba(255,255,255,0.4);
+      font-weight: 400;
+      letter-spacing: 0.02em;
+    }
+
+    /* ── Algorithm cards ── */
+    .algo-card {
+      border-radius: 28px;
+      padding: 48px 40px;
+      transition: transform 0.4s cubic-bezier(0.23,1,0.32,1), box-shadow 0.4s;
+      cursor: default;
+    }
+
+    .algo-card:hover {
+      transform: translateY(-12px) scale(1.02);
+    }
+
+    .algo-icon {
+      width: 64px; height: 64px;
+      border-radius: 18px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 28px;
+      margin-bottom: 28px;
+    }
+
+    .algo-card h3 {
+      font-size: 22px;
+      font-weight: 700;
+      margin-bottom: 12px;
+      letter-spacing: -0.02em;
+    }
+
+    .algo-card p {
+      font-size: 15px;
+      color: rgba(255,255,255,0.55);
+      line-height: 1.7;
+    }
+
+    .algo-card .analogy {
+      margin-top: 20px;
+      padding: 14px 18px;
+      border-radius: 12px;
+      background: rgba(255,255,255,0.04);
+      border-left: 3px solid;
+      font-size: 13px;
+      color: rgba(255,255,255,0.7);
+      font-style: italic;
+      line-height: 1.6;
+    }
+
+    /* ── Flow diagram ── */
+    .flow-container {
+      overflow-x: auto;
+      padding: 20px 0;
+    }
+
+    .flow-svg-wrap {
+      min-width: 760px;
+    }
+
+    /* ── Market gap table ── */
+    .gap-table {
+      width: 100%;
+      border-collapse: separate;
+      border-spacing: 0;
+    }
+
+    .gap-table th {
+      padding: 16px 24px;
+      text-align: left;
+      font-size: 12px;
+      font-weight: 600;
+      color: rgba(255,255,255,0.4);
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      border-bottom: 1px solid rgba(255,255,255,0.06);
+    }
+
+    .gap-table td {
+      padding: 18px 24px;
+      font-size: 15px;
+      color: rgba(255,255,255,0.75);
+      border-bottom: 1px solid rgba(255,255,255,0.04);
+      vertical-align: top;
+    }
+
+    .gap-table tr:hover td { background: rgba(255,255,255,0.02); }
+
+    .gap-table .tag {
+      display: inline-block;
+      padding: 4px 12px;
+      border-radius: 980px;
+      font-size: 11px;
+      font-weight: 600;
+      background: rgba(168,85,247,0.15);
+      color: #a855f7;
+      border: 1px solid rgba(168,85,247,0.25);
+      white-space: nowrap;
+    }
+
+    /* ── Comparison table ── */
+    .compare-table { width: 100%; border-collapse: separate; border-spacing: 0; }
+    .compare-table th { padding: 16px 20px; font-size: 13px; font-weight: 600; text-align: center; border-bottom: 1px solid rgba(255,255,255,0.08); }
+    .compare-table td { padding: 14px 20px; font-size: 14px; text-align: center; border-bottom: 1px solid rgba(255,255,255,0.04); color: rgba(255,255,255,0.7); }
+    .compare-table .our { color: #a855f7; font-weight: 700; }
+    .compare-table .check { color: #22c55e; font-size: 18px; }
+    .compare-table .cross { color: rgba(255,255,255,0.2); font-size: 18px; }
+    .compare-table tr:hover td { background: rgba(255,255,255,0.02); }
+
+    /* ── Timeline ── */
+    .timeline { position: relative; padding-left: 40px; }
+    .timeline::before { content: ''; position: absolute; left: 16px; top: 0; bottom: 0; width: 2px; background: linear-gradient(to bottom, #a855f7, #3b82f6, #06b6d4); opacity: 0.3; border-radius: 2px; }
+    .timeline-item { position: relative; padding: 0 0 48px 40px; }
+    .timeline-dot { position: absolute; left: -32px; top: 6px; width: 16px; height: 16px; border-radius: 50%; background: linear-gradient(135deg, #a855f7, #3b82f6); box-shadow: 0 0 20px rgba(168,85,247,0.6); }
+    .timeline-item h4 { font-size: 18px; font-weight: 700; margin-bottom: 8px; letter-spacing: -0.02em; }
+    .timeline-item p { font-size: 14px; color: rgba(255,255,255,0.5); line-height: 1.7; }
+
+    /* ── Tech stack pills ── */
+    .tech-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 20px;
+      border-radius: 980px;
+      background: rgba(255,255,255,0.05);
+      border: 1px solid rgba(255,255,255,0.1);
+      font-size: 13px;
+      font-weight: 500;
+      color: rgba(255,255,255,0.8);
+      transition: all 0.2s;
+    }
+
+    .tech-pill:hover {
+      background: rgba(168,85,247,0.1);
+      border-color: rgba(168,85,247,0.3);
+      transform: translateY(-2px);
+    }
+
+    /* ── Team cards ── */
+    .team-card {
+      border-radius: 28px;
+      padding: 48px 36px;
+      text-align: center;
+      transition: transform 0.4s cubic-bezier(0.23,1,0.32,1);
+    }
+
+    .team-card:hover { transform: translateY(-12px); }
+
+    .avatar-ring {
+      width: 100px; height: 100px;
+      border-radius: 50%;
+      margin: 0 auto 24px;
+      padding: 3px;
+      background: linear-gradient(135deg, #a855f7, #3b82f6, #06b6d4);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .avatar-inner {
+      width: 100%; height: 100%;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #1a1a2e, #16213e);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 36px;
+    }
+
+    .team-card h3 { font-size: 22px; font-weight: 700; margin-bottom: 6px; letter-spacing: -0.02em; }
+    .team-card .role { font-size: 14px; color: rgba(255,255,255,0.4); margin-bottom: 20px; }
+
+    .linkedin-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 24px;
+      border-radius: 980px;
+      background: rgba(10,102,194,0.15);
+      border: 1px solid rgba(10,102,194,0.3);
+      color: #60a5fa;
+      text-decoration: none;
+      font-size: 13px;
+      font-weight: 600;
+      transition: all 0.2s;
+    }
+
+    .linkedin-btn:hover {
+      background: rgba(10,102,194,0.3);
+      border-color: rgba(10,102,194,0.6);
+      transform: scale(1.05);
+    }
+
+    /* ── Section headings ── */
+    .section-label {
+      font-size: 12px;
+      font-weight: 600;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: #a855f7;
+      margin-bottom: 16px;
+    }
+
+    .section-title {
+      font-size: clamp(36px, 5vw, 64px);
+      font-weight: 800;
+      letter-spacing: -0.04em;
+      line-height: 1.05;
+      margin-bottom: 20px;
+    }
+
+    .section-sub {
+      font-size: 18px;
+      color: rgba(255,255,255,0.45);
+      font-weight: 300;
+      line-height: 1.7;
+      max-width: 560px;
+    }
+
+    /* ── Aurora blobs ── */
+    .aurora {
+      position: absolute;
+      border-radius: 50%;
+      filter: blur(120px);
+      pointer-events: none;
+      animation: drift 8s ease-in-out infinite alternate;
+    }
+
+    @keyframes drift {
+      from { transform: translate(0,0) scale(1); }
+      to   { transform: translate(40px, 30px) scale(1.1); }
+    }
+
+    /* ── Scroll reveal ── */
+    .reveal {
+      opacity: 0;
+      transform: translateY(40px);
+      transition: opacity 0.8s cubic-bezier(0.23,1,0.32,1), transform 0.8s cubic-bezier(0.23,1,0.32,1);
+    }
+
+    .reveal.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    /* ── Feature grid ── */
+    .feature-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 20px;
+      padding: 28px;
+      border-radius: 20px;
+      transition: background 0.3s;
+    }
+
+    .feature-item:hover { background: rgba(255,255,255,0.03); }
+
+    .feature-icon {
+      width: 48px; height: 48px;
+      flex-shrink: 0;
+      border-radius: 14px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 22px;
+    }
+
+    .feature-item h4 { font-size: 16px; font-weight: 700; margin-bottom: 6px; }
+    .feature-item p  { font-size: 14px; color: rgba(255,255,255,0.45); line-height: 1.65; }
+
+    /* ── Footer ── */
+    footer {
+      border-top: 1px solid rgba(255,255,255,0.06);
+      padding: 60px 48px 40px;
+      text-align: center;
+      position: relative;
+      z-index: 2;
+    }
+
+    footer p { font-size: 13px; color: rgba(255,255,255,0.25); }
+    footer a { color: rgba(255,255,255,0.4); text-decoration: none; transition: color 0.2s; }
+    footer a:hover { color: rgba(255,255,255,0.8); }
+
+    /* ── Mobile ── */
+    @media (max-width: 768px) {
+      nav { padding: 14px 20px; }
+      nav ul { display: none; }
+      .hero { padding: 100px 20px 60px; }
+      .stat-grid { grid-template-columns: repeat(2, 1fr); }
+    }
+
+    /* ── Floating particles ── */
+    .particle {
+      position: absolute;
+      border-radius: 50%;
+      pointer-events: none;
+      animation: float-up linear infinite;
+      opacity: 0;
+    }
+
+    @keyframes float-up {
+      0%   { opacity: 0; transform: translateY(0) scale(0); }
+      10%  { opacity: 1; }
+      90%  { opacity: 0.3; }
+      100% { opacity: 0; transform: translateY(-300px) scale(1.5); }
+    }
+
+    /* smooth counter */
+    .counter { display: inline-block; }
+
+    /* Bento grid */
+    .bento-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      grid-template-rows: auto;
+      gap: 16px;
+    }
+
+    .bento-cell {
+      border-radius: 24px;
+      padding: 36px 32px;
+      transition: transform 0.35s cubic-bezier(0.23,1,0.32,1);
+    }
+
+    .bento-cell:hover { transform: scale(1.02); }
+    .bento-wide { grid-column: span 2; }
+    .bento-tall { grid-row: span 2; }
+
+    @media (max-width: 900px) {
+      .bento-grid { grid-template-columns: 1fr; }
+      .bento-wide, .bento-tall { grid-column: auto; grid-row: auto; }
+    }
+
+    /* Roadmap pills */
+    .roadmap-pill {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 16px 20px;
+      border-radius: 14px;
+      background: rgba(255,255,255,0.03);
+      border: 1px solid rgba(255,255,255,0.06);
+      transition: all 0.2s;
+    }
+
+    .roadmap-pill:hover {
+      background: rgba(168,85,247,0.06);
+      border-color: rgba(168,85,247,0.2);
+      transform: translateX(6px);
+    }
+
+    .roadmap-pill .dot {
+      width: 8px; height: 8px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #a855f7, #3b82f6);
+      flex-shrink: 0;
+    }
+
+    /* Scrollbar */
+    ::-webkit-scrollbar { width: 6px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: rgba(168,85,247,0.3); border-radius: 3px; }
+  </style>
+</head>
+<body>
+
+<!-- ═══════════════════════ THREE.JS BACKGROUND ═══════════════════════ -->
+<canvas id="bg-canvas"></canvas>
+
+<!-- ═══════════════════════ NAVIGATION ═══════════════════════ -->
+<nav id="nav">
+  <div class="logo">
+    <span class="grad-purple">CineAI</span>
+  </div>
+  <ul>
+    <li><a href="#problem">Problem</a></li>
+    <li><a href="#how">How It Works</a></li>
+    <li><a href="#tech">Architecture</a></li>
+    <li><a href="#market">Market</a></li>
+    <li><a href="#team">Team</a></li>
+    <li><a href="https://github.com/AmanAsgola/Movie-Recommendation-System" target="_blank" class="nav-cta">View on GitHub →</a></li>
+  </ul>
+</nav>
+
+<!-- ═══════════════════════ HERO ═══════════════════════ -->
+<section class="hero" id="home">
+  <div class="aurora" style="width:600px;height:600px;background:rgba(168,85,247,0.15);top:-200px;left:-100px;animation-duration:10s;"></div>
+  <div class="aurora" style="width:500px;height:500px;background:rgba(59,130,246,0.12);top:100px;right:-150px;animation-duration:7s;animation-delay:-3s;"></div>
+
+  <div class="hero-badge reveal">
+    <span>✦</span>
+    AI-Powered · Open Source · Hybrid ML
+  </div>
+
+  <h1 class="reveal">
+    <span class="grad-hero">Movies That<br/>Find You.</span>
+  </h1>
+
+  <p class="reveal">
+    The intelligent recommendation engine that thinks like Netflix, works like your best friend,
+    and is completely open to deploy on your own terms.
+  </p>
+
+  <div class="hero-btns reveal">
+    <a href="#how" class="btn-primary">Explore the Product</a>
+    <a href="https://github.com/AmanAsgola/Movie-Recommendation-System" target="_blank" class="btn-secondary">★ Star on GitHub</a>
+  </div>
+
+  <!-- 3D Movie Cards -->
+  <div class="movie-3d-scene reveal">
+    <div class="movie-card-3d" style="--c1:#7c3aed;--c2:#2563eb;left:0px;top:40px;transform:rotate(-18deg) translateZ(0);">
+      <div class="poster"><div class="movie-icon">🎭</div>The Dark Knight</div>
+    </div>
+    <div class="movie-card-3d" style="--c1:#db2777;--c2:#9333ea;left:120px;top:10px;transform:rotate(-10deg) translateZ(20px);">
+      <div class="poster"><div class="movie-icon">🚀</div>Interstellar</div>
+    </div>
+    <div class="movie-card-3d" style="--c1:#0891b2;--c2:#7c3aed;left:240px;top:0px;transform:rotate(-3deg) translateZ(40px);">
+      <div class="poster"><div class="movie-icon">🧠</div>Inception</div>
+    </div>
+    <div class="movie-card-3d" style="--c1:#059669;--c2:#0891b2;left:370px;top:0px;transform:rotate(4deg) translateZ(50px);">
+      <div class="poster"><div class="movie-icon">⚡</div>The Matrix</div>
+    </div>
+    <div class="movie-card-3d" style="--c1:#d97706;--c2:#dc2626;left:500px;top:8px;transform:rotate(11deg) translateZ(30px);">
+      <div class="poster"><div class="movie-icon">🌌</div>Avengers</div>
+    </div>
+    <div class="movie-card-3d" style="--c1:#7c3aed;--c2:#be185d;left:620px;top:30px;transform:rotate(18deg) translateZ(10px);">
+      <div class="poster"><div class="movie-icon">🎬</div>Pulp Fiction</div>
+    </div>
+    <div class="movie-card-3d" style="--c1:#1d4ed8;--c2:#4f46e5;left:740px;top:50px;transform:rotate(24deg) translateZ(0);">
+      <div class="poster"><div class="movie-icon">🏆</div>Forrest Gump</div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════ STATS BAR ═══════════════════════ -->
+<section style="padding: 0 48px 100px;">
+  <div class="stat-grid glass reveal" style="max-width:1200px;margin:0 auto;">
+    <div class="stat-cell">
+      <div class="stat-num grad-purple"><span class="counter" data-target="27278">0</span>+</div>
+      <div class="stat-label">Movies in Dataset</div>
+    </div>
+    <div class="stat-cell">
+      <div class="stat-num grad-cyan">20M+</div>
+      <div class="stat-label">Ratings Analyzed</div>
+    </div>
+    <div class="stat-cell">
+      <div class="stat-num grad-gold"><span class="counter" data-target="3">0</span></div>
+      <div class="stat-label">ML Engines</div>
+    </div>
+    <div class="stat-cell">
+      <div class="stat-num" style="background:linear-gradient(135deg,#22c55e,#06b6d4);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;">&lt;2s</div>
+      <div class="stat-label">Recommendation Speed</div>
+    </div>
+    <div class="stat-cell">
+      <div class="stat-num grad-purple">42%</div>
+      <div class="stat-label">Precision@10 Score</div>
+    </div>
+    <div class="stat-cell">
+      <div class="stat-num grad-gold">1.2x</div>
+      <div class="stat-label">Hybrid Boost Factor</div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════ THE PROBLEM ═══════════════════════ -->
+<section id="problem" style="padding: 100px 48px;">
+  <div style="max-width:1200px;margin:0 auto;">
+    <div class="aurora" style="width:400px;height:400px;background:rgba(236,72,153,0.1);right:0;top:-100px;"></div>
+
+    <div class="reveal" style="margin-bottom: 80px;">
+      <div class="section-label">The Problem</div>
+      <h2 class="section-title">$330B market.<br/><span class="grad-purple">Still can't find</span><br/>anything to watch.</h2>
+      <p class="section-sub" style="margin-top:20px;">
+        The global streaming market is exploding — but the #1 complaint from users across Netflix, Prime, and Disney+ is: <em style="color:rgba(255,255,255,0.7)">"I can't find anything good to watch."</em>
+      </p>
+    </div>
+
+    <!-- Bento problem cards -->
+    <div class="bento-grid reveal">
+      <div class="bento-cell bento-wide glass-strong glow-purple">
+        <div style="font-size:48px;margin-bottom:20px;">😵</div>
+        <h3 style="font-size:28px;font-weight:800;letter-spacing:-0.03em;margin-bottom:12px;">Decision Fatigue is Real</h3>
+        <p style="color:rgba(255,255,255,0.5);font-size:16px;line-height:1.7;">The average person spends 17+ minutes searching for something to watch before giving up and closing the app. Every failed recommendation is a churn risk worth millions to the platform.</p>
+      </div>
+      <div class="bento-cell glass" style="display:flex;flex-direction:column;justify-content:space-between;">
+        <div style="font-size:36px;margin-bottom:16px;">📊</div>
+        <div>
+          <div style="font-size:52px;font-weight:800;letter-spacing:-0.04em;" class="grad-purple">80%</div>
+          <div style="font-size:15px;color:rgba(255,255,255,0.45);margin-top:8px;">of Netflix content watched comes from its recommendation engine</div>
+        </div>
+      </div>
+      <div class="bento-cell glass">
+        <div style="font-size:36px;margin-bottom:16px;">💰</div>
+        <div style="font-size:52px;font-weight:800;letter-spacing:-0.04em;" class="grad-gold">35%</div>
+        <div style="font-size:15px;color:rgba(255,255,255,0.45);margin-top:8px;">of Amazon's total revenue attributed to its recommendation system</div>
+      </div>
+      <div class="bento-cell glass">
+        <div style="font-size:36px;margin-bottom:16px;">🔒</div>
+        <div style="font-size:52px;font-weight:800;letter-spacing:-0.04em;" class="grad-cyan">$0</div>
+        <div style="font-size:15px;color:rgba(255,255,255,0.45);margin-top:8px;">available to smaller platforms — Netflix's algorithm is a closed, proprietary black box</div>
+      </div>
+      <div class="bento-cell bento-wide glass">
+        <div style="font-size:36px;margin-bottom:20px;">🚧</div>
+        <h3 style="font-size:22px;font-weight:700;margin-bottom:12px;">The Cold Start Problem</h3>
+        <p style="color:rgba(255,255,255,0.5);font-size:15px;line-height:1.7;">New users with zero rating history get the same generic "top movies" everyone else sees. Single-algorithm systems can't bridge this gap — they need data before they can help. Our hybrid approach solves this from day one.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════ HOW IT WORKS ═══════════════════════ -->
+<section id="how" style="padding: 100px 48px;">
+  <div style="max-width:1200px;margin:0 auto;">
+    <div class="reveal" style="margin-bottom:80px;text-align:center;">
+      <div class="section-label" style="text-align:center;">How It Works</div>
+      <h2 class="section-title" style="text-align:center;">Three engines.<br/><span class="grad-cyan">One perfect answer.</span></h2>
+      <p class="section-sub" style="margin:20px auto 0;text-align:center;">
+        No ML background required. Here's the intuition behind each algorithm.
+      </p>
+    </div>
+
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:24px;" class="reveal">
+      <!-- Content-based -->
+      <div class="algo-card glass-strong glow-purple">
+        <div class="algo-icon" style="background:rgba(168,85,247,0.15);">🎯</div>
+        <h3>Content-Based<br/>Filtering</h3>
+        <p>Analyzes <strong style="color:#a855f7">what movies are</strong> — their genres, themes, and metadata — converting them into TF-IDF vectors. Finds films that are mathematically closest to what you already love using cosine similarity.</p>
+        <div class="analogy" style="border-color:#a855f7;">
+          "You liked Inception? Here are other mind-bending thrillers with similar genre DNA — no user data needed."
+        </div>
+        <div style="margin-top:24px;display:flex;flex-wrap:wrap;gap:8px;">
+          <span style="padding:4px 12px;border-radius:980px;background:rgba(168,85,247,0.1);border:1px solid rgba(168,85,247,0.2);font-size:11px;color:#a855f7;">TF-IDF Vectors</span>
+          <span style="padding:4px 12px;border-radius:980px;background:rgba(168,85,247,0.1);border:1px solid rgba(168,85,247,0.2);font-size:11px;color:#a855f7;">K-Nearest Neighbors</span>
+          <span style="padding:4px 12px;border-radius:980px;background:rgba(168,85,247,0.1);border:1px solid rgba(168,85,247,0.2);font-size:11px;color:#a855f7;">Cosine Similarity</span>
+          <span style="padding:4px 12px;border-radius:980px;background:rgba(168,85,247,0.1);border:1px solid rgba(168,85,247,0.2);font-size:11px;color:#a855f7;">Fuzzy Title Match</span>
+        </div>
+      </div>
+
+      <!-- Collaborative -->
+      <div class="algo-card glass-strong glow-blue">
+        <div class="algo-icon" style="background:rgba(59,130,246,0.15);">👥</div>
+        <h3>Collaborative<br/>Filtering (SVD)</h3>
+        <p>Studies <strong style="color:#3b82f6">who rated what</strong>. Singular Value Decomposition discovers hidden patterns across 20M+ ratings — finding users with identical taste profiles and surfacing unseen gems.</p>
+        <div class="analogy" style="border-color:#3b82f6;">
+          "Users just like you — who also loved Inception — all rated Interstellar and The Prestige in their top 5."
+        </div>
+        <div style="margin-top:24px;display:flex;flex-wrap:wrap;gap:8px;">
+          <span style="padding:4px 12px;border-radius:980px;background:rgba(59,130,246,0.1);border:1px solid rgba(59,130,246,0.2);font-size:11px;color:#3b82f6;">SVD Matrix Factorization</span>
+          <span style="padding:4px 12px;border-radius:980px;background:rgba(59,130,246,0.1);border:1px solid rgba(59,130,246,0.2);font-size:11px;color:#3b82f6;">30 Latent Factors</span>
+          <span style="padding:4px 12px;border-radius:980px;background:rgba(59,130,246,0.1);border:1px solid rgba(59,130,246,0.2);font-size:11px;color:#3b82f6;">scikit-surprise</span>
+          <span style="padding:4px 12px;border-radius:980px;background:rgba(59,130,246,0.1);border:1px solid rgba(59,130,246,0.2);font-size:11px;color:#3b82f6;">20M Ratings</span>
+        </div>
+      </div>
+
+      <!-- Hybrid -->
+      <div class="algo-card glass-strong" style="box-shadow:0 0 60px rgba(6,182,212,0.2),0 0 120px rgba(6,182,212,0.08);">
+        <div class="algo-icon" style="background:rgba(6,182,212,0.15);">⚡</div>
+        <h3>Hybrid<br/>Engine</h3>
+        <p>Runs both algorithms in parallel and applies a <strong style="color:#06b6d4">1.2× boost multiplier</strong> to movies appearing in both outputs. The result is recommendations that are both deeply personal and contextually relevant.</p>
+        <div class="analogy" style="border-color:#06b6d4;">
+          "Your taste-matched friend who also knows your genre preferences — giving you a joint, calibrated top 10."
+        </div>
+        <div style="margin-top:24px;display:flex;flex-wrap:wrap;gap:8px;">
+          <span style="padding:4px 12px;border-radius:980px;background:rgba(6,182,212,0.1);border:1px solid rgba(6,182,212,0.2);font-size:11px;color:#06b6d4;">Score Fusion</span>
+          <span style="padding:4px 12px;border-radius:980px;background:rgba(6,182,212,0.1);border:1px solid rgba(6,182,212,0.2);font-size:11px;color:#06b6d4;">1.2× Boost</span>
+          <span style="padding:4px 12px;border-radius:980px;background:rgba(6,182,212,0.1);border:1px solid rgba(6,182,212,0.2);font-size:11px;color:#06b6d4;">Top-50 Pool</span>
+          <span style="padding:4px 12px;border-radius:980px;background:rgba(6,182,212,0.1);border:1px solid rgba(6,182,212,0.2);font-size:11px;color:#06b6d4;">Cold-Start Safe</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════ ARCHITECTURE FLOW DIAGRAM ═══════════════════════ -->
+<section id="tech" style="padding: 100px 48px; background: rgba(255,255,255,0.01);">
+  <div style="max-width:1200px;margin:0 auto;">
+    <div class="reveal" style="margin-bottom:60px;">
+      <div class="section-label">Technical Architecture</div>
+      <h2 class="section-title">How the pipeline<br/><span class="grad-purple">actually runs.</span></h2>
+      <p class="section-sub" style="margin-top:16px;">End-to-end system flow — from your typed title to a personalized, poster-rich result grid.</p>
+    </div>
+
+    <!-- SVG Flow Diagram -->
+    <div class="glass reveal" style="border-radius:28px;padding:48px;overflow-x:auto;">
+      <svg viewBox="0 0 900 580" xmlns="http://www.w3.org/2000/svg" style="width:100%;min-width:700px;display:block;">
+        <defs>
+          <linearGradient id="gp" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stop-color="#a855f7"/>
+            <stop offset="100%" stop-color="#3b82f6"/>
+          </linearGradient>
+          <linearGradient id="gb" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stop-color="#3b82f6"/>
+            <stop offset="100%" stop-color="#06b6d4"/>
+          </linearGradient>
+          <linearGradient id="gg" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stop-color="#22c55e"/>
+            <stop offset="100%" stop-color="#06b6d4"/>
+          </linearGradient>
+          <marker id="arr" markerWidth="10" markerHeight="7" refX="10" refY="3.5" orient="auto">
+            <polygon points="0 0, 10 3.5, 0 7" fill="rgba(168,85,247,0.6)"/>
+          </marker>
+          <filter id="glow-f">
+            <feGaussianBlur stdDeviation="3" result="coloredBlur"/>
+            <feMerge><feMergeNode in="coloredBlur"/><feMergeNode in="SourceGraphic"/></feMerge>
+          </filter>
+        </defs>
+
+        <!-- User Input Box -->
+        <rect x="330" y="20" width="240" height="64" rx="16" fill="url(#gp)" filter="url(#glow-f)" opacity="0.9"/>
+        <text x="450" y="48" text-anchor="middle" fill="white" font-size="13" font-weight="700" font-family="Inter,sans-serif">🎬 User Input</text>
+        <text x="450" y="66" text-anchor="middle" fill="rgba(255,255,255,0.7)" font-size="11" font-family="Inter,sans-serif">Movie Title / User ID</text>
+
+        <!-- Arrow down to Fuzzy -->
+        <line x1="450" y1="84" x2="450" y2="118" stroke="rgba(168,85,247,0.5)" stroke-width="2" marker-end="url(#arr)" stroke-dasharray="4,3"/>
+
+        <!-- Fuzzy Match -->
+        <rect x="330" y="120" width="240" height="56" rx="14" fill="rgba(168,85,247,0.12)" stroke="rgba(168,85,247,0.3)" stroke-width="1"/>
+        <text x="450" y="147" text-anchor="middle" fill="white" font-size="12" font-weight="600" font-family="Inter,sans-serif">⚡ RapidFuzz Matching</text>
+        <text x="450" y="164" text-anchor="middle" fill="rgba(255,255,255,0.5)" font-size="10" font-family="Inter,sans-serif">75% confidence threshold</text>
+
+        <!-- Arrow split -->
+        <line x1="450" y1="176" x2="450" y2="204" stroke="rgba(168,85,247,0.5)" stroke-width="2" stroke-dasharray="4,3"/>
+        <line x1="450" y1="204" x2="200" y2="204" stroke="rgba(168,85,247,0.5)" stroke-width="2" stroke-dasharray="4,3"/>
+        <line x1="450" y1="204" x2="700" y2="204" stroke="rgba(59,130,246,0.5)" stroke-width="2" stroke-dasharray="4,3"/>
+        <line x1="200" y1="204" x2="200" y2="230" stroke="rgba(168,85,247,0.5)" stroke-width="2" marker-end="url(#arr)" stroke-dasharray="4,3"/>
+        <line x1="700" y1="204" x2="700" y2="230" stroke="rgba(59,130,246,0.5)" stroke-width="2" stroke-dasharray="4,3"/>
+        <marker id="arr2" markerWidth="10" markerHeight="7" refX="10" refY="3.5" orient="auto">
+          <polygon points="0 0, 10 3.5, 0 7" fill="rgba(59,130,246,0.6)"/>
+        </marker>
+        <line x1="700" y1="230" x2="700" y2="230" stroke="rgba(59,130,246,0.5)" stroke-width="2" marker-end="url(#arr2)" stroke-dasharray="4,3"/>
+        <!-- fix arrow on right -->
+        <polyline points="700,204 700,230" stroke="rgba(59,130,246,0.5)" stroke-width="2" marker-end="url(#arr2)" fill="none" stroke-dasharray="4,3"/>
+
+        <!-- Content-Based Engine -->
+        <rect x="80" y="232" width="240" height="100" rx="16" fill="rgba(168,85,247,0.08)" stroke="rgba(168,85,247,0.35)" stroke-width="1.5"/>
+        <text x="200" y="260" text-anchor="middle" fill="#a855f7" font-size="13" font-weight="700" font-family="Inter,sans-serif">🎯 Content-Based Engine</text>
+        <text x="200" y="280" text-anchor="middle" fill="rgba(255,255,255,0.5)" font-size="10" font-family="Inter,sans-serif">TF-IDF Vectorization</text>
+        <text x="200" y="296" text-anchor="middle" fill="rgba(255,255,255,0.5)" font-size="10" font-family="Inter,sans-serif">KNN + Cosine Similarity</text>
+        <text x="200" y="312" text-anchor="middle" fill="rgba(255,255,255,0.5)" font-size="10" font-family="Inter,sans-serif">Genre + Title Features</text>
+        <text x="200" y="326" text-anchor="middle" fill="rgba(255,255,255,0.35)" font-size="9" font-family="Inter,sans-serif">Top-50 content matches →</text>
+
+        <!-- SVD Engine -->
+        <rect x="580" y="232" width="240" height="100" rx="16" fill="rgba(59,130,246,0.08)" stroke="rgba(59,130,246,0.35)" stroke-width="1.5"/>
+        <text x="700" y="260" text-anchor="middle" fill="#3b82f6" font-size="13" font-weight="700" font-family="Inter,sans-serif">👥 SVD Collaborative</text>
+        <text x="700" y="280" text-anchor="middle" fill="rgba(255,255,255,0.5)" font-size="10" font-family="Inter,sans-serif">Matrix Factorization</text>
+        <text x="700" y="296" text-anchor="middle" fill="rgba(255,255,255,0.5)" font-size="10" font-family="Inter,sans-serif">30 Latent Factors · 5 Epochs</text>
+        <text x="700" y="312" text-anchor="middle" fill="rgba(255,255,255,0.5)" font-size="10" font-family="Inter,sans-serif">30K sampled ratings</text>
+        <text x="700" y="326" text-anchor="middle" fill="rgba(255,255,255,0.35)" font-size="9" font-family="Inter,sans-serif">Predicted scores →</text>
+
+        <!-- Arrows to Hybrid -->
+        <polyline points="200,332 200,404 340,404" stroke="rgba(168,85,247,0.5)" stroke-width="2" fill="none" stroke-dasharray="4,3" marker-end="url(#arr)"/>
+        <polyline points="700,332 700,404 560,404" stroke="rgba(59,130,246,0.5)" stroke-width="2" fill="none" stroke-dasharray="4,3" marker-end="url(#arr2)"/>
+
+        <!-- Hybrid Engine -->
+        <rect x="310" y="382" width="280" height="72" rx="16" fill="url(#gb)" opacity="0.85" filter="url(#glow-f)"/>
+        <text x="450" y="412" text-anchor="middle" fill="white" font-size="13" font-weight="700" font-family="Inter,sans-serif">⚡ Hybrid Engine</text>
+        <text x="450" y="430" text-anchor="middle" fill="rgba(255,255,255,0.8)" font-size="11" font-family="Inter,sans-serif">SVD score + 1.2× boost (if in content set)</text>
+        <text x="450" y="448" text-anchor="middle" fill="rgba(255,255,255,0.6)" font-size="10" font-family="Inter,sans-serif">Ranked fusion → Top-N list</text>
+
+        <!-- Arrow to TMDB -->
+        <line x1="450" y1="454" x2="450" y2="488" stroke="rgba(6,182,212,0.5)" stroke-width="2" stroke-dasharray="4,3"/>
+        <marker id="arr3" markerWidth="10" markerHeight="7" refX="10" refY="3.5" orient="auto">
+          <polygon points="0 0, 10 3.5, 0 7" fill="rgba(6,182,212,0.6)"/>
+        </marker>
+        <line x1="450" y1="488" x2="450" y2="488" stroke="rgba(6,182,212,0.5)" stroke-width="2" marker-end="url(#arr3)"/>
+        <polyline points="450,454 450,490" stroke="rgba(6,182,212,0.5)" stroke-width="2" fill="none" stroke-dasharray="4,3" marker-end="url(#arr3)"/>
+
+        <!-- TMDB Poster Box -->
+        <rect x="330" y="492" width="240" height="52" rx="14" fill="rgba(6,182,212,0.08)" stroke="rgba(6,182,212,0.35)" stroke-width="1.5"/>
+        <text x="450" y="516" text-anchor="middle" fill="#06b6d4" font-size="12" font-weight="700" font-family="Inter,sans-serif">🖼 TheMovieDB API</text>
+        <text x="450" y="534" text-anchor="middle" fill="rgba(255,255,255,0.4)" font-size="10" font-family="Inter,sans-serif">Live poster fetch per result</text>
+
+        <!-- Final output -->
+        <rect x="310" y="558" width="280" height="18" rx="6" fill="url(#gg)" opacity="0.3"/>
+        <text x="450" y="571" text-anchor="middle" fill="rgba(255,255,255,0.6)" font-size="10" font-family="Inter,sans-serif">✦ Top-10 Results · Poster Grid · &lt;2s</text>
+        <polyline points="450,544 450,556" stroke="rgba(6,182,212,0.5)" stroke-width="2" fill="none" stroke-dasharray="4,3" marker-end="url(#arr3)"/>
+      </svg>
+    </div>
+
+    <!-- Tech Stack -->
+    <div class="reveal" style="margin-top:60px;">
+      <h3 style="font-size:20px;font-weight:700;margin-bottom:28px;letter-spacing:-0.02em;">Technology Stack</h3>
+      <div style="display:flex;flex-wrap:wrap;gap:12px;">
+        <span class="tech-pill">🐍 Python 3.8+</span>
+        <span class="tech-pill">🤖 scikit-learn</span>
+        <span class="tech-pill">📐 scikit-surprise (SVD)</span>
+        <span class="tech-pill">🔢 NumPy · SciPy</span>
+        <span class="tech-pill">🐼 Pandas</span>
+        <span class="tech-pill">🌐 Streamlit</span>
+        <span class="tech-pill">🔍 RapidFuzz</span>
+        <span class="tech-pill">🎬 TMDB API</span>
+        <span class="tech-pill">📊 MovieLens 20M</span>
+        <span class="tech-pill">⚡ Sparse Matrices</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════ MARKET GAP ═══════════════════════ -->
+<section id="market" style="padding: 100px 48px;">
+  <div style="max-width:1200px;margin:0 auto;">
+    <div class="aurora" style="width:500px;height:500px;background:rgba(245,158,11,0.08);left:-100px;top:0;animation-duration:9s;"></div>
+
+    <div class="reveal" style="margin-bottom:60px;">
+      <div class="section-label">Market Opportunity</div>
+      <h2 class="section-title">Five gaps.<br/><span class="grad-gold">One system.</span></h2>
+    </div>
+
+    <div class="glass reveal" style="border-radius:24px;overflow:hidden;margin-bottom:80px;">
+      <table class="gap-table">
+        <thead>
+          <tr>
+            <th>Market Gap</th>
+            <th>Industry Status</th>
+            <th>Our Solution</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><span class="tag">Closed Ecosystems</span></td>
+            <td>Netflix, Spotify, Amazon keep models proprietary. Smaller platforms are locked out.</td>
+            <td style="color:#22c55e;">✓ Fully open-source · Self-hostable · No vendor lock-in</td>
+          </tr>
+          <tr>
+            <td><span class="tag">Cold Start Problem</span></td>
+            <td>New users with no history get generic suggestions — immediate churn risk.</td>
+            <td style="color:#22c55e;">✓ Content-based engine works on day 1 with zero user history</td>
+          </tr>
+          <tr>
+            <td><span class="tag">Single-Algorithm</span></td>
+            <td>Most platforms use collaborative OR content-based, not a true hybrid.</td>
+            <td style="color:#22c55e;">✓ Three engines fused with a score-boosting hybrid layer</td>
+          </tr>
+          <tr>
+            <td><span class="tag">No Explainability</span></td>
+            <td>Users see recommendations but have no idea why — zero trust or discovery.</td>
+            <td style="color:#a855f7;">⧖ On roadmap — explainability module with genre reasoning</td>
+          </tr>
+          <tr>
+            <td><span class="tag">High Entry Cost</span></td>
+            <td>Building rec infrastructure costs $500K–$2M+ for a startup.</td>
+            <td style="color:#22c55e;">✓ Deploy in &lt;30 minutes · Free · Scales on any cloud</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Comparison Table -->
+    <div class="reveal" style="margin-bottom:20px;">
+      <h3 style="font-size:24px;font-weight:700;letter-spacing:-0.03em;margin-bottom:32px;">How we compare</h3>
+    </div>
+    <div class="glass reveal" style="border-radius:24px;overflow:hidden;">
+      <table class="compare-table">
+        <thead>
+          <tr>
+            <th style="text-align:left;padding-left:28px;">Feature</th>
+            <th>Netflix</th>
+            <th>Spotify</th>
+            <th>IMDb</th>
+            <th class="our">CineAI</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td style="text-align:left;padding-left:28px;font-weight:500;">Collaborative Filtering</td>
+            <td class="check">✓</td><td class="check">✓</td><td class="cross">✗</td><td class="check our">✓</td>
+          </tr>
+          <tr>
+            <td style="text-align:left;padding-left:28px;font-weight:500;">Content-Based Filtering</td>
+            <td class="check">✓</td><td class="check">✓</td><td class="check">✓</td><td class="check our">✓</td>
+          </tr>
+          <tr>
+            <td style="text-align:left;padding-left:28px;font-weight:500;">Hybrid Engine</td>
+            <td class="check">✓</td><td class="check">✓</td><td class="cross">✗</td><td class="check our">✓</td>
+          </tr>
+          <tr>
+            <td style="text-align:left;padding-left:28px;font-weight:500;">Open Source</td>
+            <td class="cross">✗</td><td class="cross">✗</td><td class="cross">✗</td><td class="check our">✓</td>
+          </tr>
+          <tr>
+            <td style="text-align:left;padding-left:28px;font-weight:500;">Self-Hostable</td>
+            <td class="cross">✗</td><td class="cross">✗</td><td class="cross">✗</td><td class="check our">✓</td>
+          </tr>
+          <tr>
+            <td style="text-align:left;padding-left:28px;font-weight:500;">Fuzzy Title Search</td>
+            <td class="check">✓</td><td class="check">✓</td><td class="cross">✗</td><td class="check our">✓</td>
+          </tr>
+          <tr>
+            <td style="text-align:left;padding-left:28px;font-weight:500;">Cost to Deploy</td>
+            <td>Proprietary</td><td>Proprietary</td><td>Limited API</td><td class="our" style="font-weight:700;">Free</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════ PRODUCT LIFECYCLE ═══════════════════════ -->
+<section style="padding: 100px 48px; background: rgba(255,255,255,0.01);">
+  <div style="max-width:1200px;margin:0 auto;">
+    <div class="reveal" style="margin-bottom:60px;">
+      <div class="section-label">Product Lifecycle</div>
+      <h2 class="section-title">From prototype<br/><span class="grad-cyan">to production.</span></h2>
+    </div>
+
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:80px;" class="reveal">
+      <div class="timeline">
+        <div class="timeline-item">
+          <div class="timeline-dot"></div>
+          <h4>Phase 1 · Data Foundation</h4>
+          <p>Loaded and cleaned the MovieLens 20M dataset — 27,278 movies, 138,493 users. Built genre + title feature vectors using TF-IDF. Established the content similarity matrix using sparse cosine distance.</p>
+        </div>
+        <div class="timeline-item">
+          <div class="timeline-dot" style="background:linear-gradient(135deg,#3b82f6,#06b6d4);box-shadow:0 0 20px rgba(59,130,246,0.6);"></div>
+          <h4>Phase 2 · Model Development</h4>
+          <p>Trained SVD collaborative filtering on 30K sampled ratings. Tuned 30 latent factors and 5 epochs to balance accuracy vs. compute. Implemented the 1.2× boost fusion logic for the hybrid engine.</p>
+        </div>
+        <div class="timeline-item">
+          <div class="timeline-dot" style="background:linear-gradient(135deg,#06b6d4,#22c55e);box-shadow:0 0 20px rgba(6,182,212,0.6);"></div>
+          <h4>Phase 3 · Application Layer</h4>
+          <p>Built the Streamlit web interface with real-time TMDB poster fetching. Integrated RapidFuzz (75% threshold) for forgiving title search. Deployed a 5-column responsive results grid.</p>
+        </div>
+        <div class="timeline-item" style="padding-bottom:0;">
+          <div class="timeline-dot" style="background:linear-gradient(135deg,#22c55e,#f59e0b);box-shadow:0 0 20px rgba(34,197,94,0.6);"></div>
+          <h4>Phase 4 · Evaluation</h4>
+          <p>Implemented Precision@10 evaluation framework. Achieved 42% precision on held-out test users. Documented that the hybrid approach consistently outperforms either standalone model.</p>
+        </div>
+      </div>
+
+      <!-- Business model -->
+      <div>
+        <h3 style="font-size:20px;font-weight:700;margin-bottom:28px;letter-spacing:-0.02em;">Business Model Fit</h3>
+        <div style="display:flex;flex-direction:column;gap:12px;">
+          <div class="feature-item" style="background:rgba(168,85,247,0.06);border-radius:16px;">
+            <div class="feature-icon" style="background:rgba(168,85,247,0.15);">🚀</div>
+            <div>
+              <h4>Startups</h4>
+              <p>Drop-in recommendation infrastructure — skip $1M+ of engineering. Deploy in a day, customize in a week.</p>
+            </div>
+          </div>
+          <div class="feature-item" style="background:rgba(59,130,246,0.06);border-radius:16px;">
+            <div class="feature-icon" style="background:rgba(59,130,246,0.15);">🏢</div>
+            <div>
+              <h4>Enterprise</h4>
+              <p>Self-hosted, auditable ML layer. No vendor dependency, full data sovereignty, easy integration.</p>
+            </div>
+          </div>
+          <div class="feature-item" style="background:rgba(6,182,212,0.06);border-radius:16px;">
+            <div class="feature-icon" style="background:rgba(6,182,212,0.15);">🔬</div>
+            <div>
+              <h4>Researchers</h4>
+              <p>Transparent hybrid architecture — swap in new algorithms, test ablations, benchmark against baselines.</p>
+            </div>
+          </div>
+          <div class="feature-item" style="background:rgba(245,158,11,0.06);border-radius:16px;">
+            <div class="feature-icon" style="background:rgba(245,158,11,0.15);">📚</div>
+            <div>
+              <h4>Educators &amp; Learners</h4>
+              <p>Complete end-to-end example of production ML — data, model, evaluation, UI, and API in one repo.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════ WHY WE BUILT IT ═══════════════════════ -->
+<section style="padding: 100px 48px;">
+  <div style="max-width:1200px;margin:0 auto;">
+    <div class="reveal" style="display:grid;grid-template-columns:1fr 1fr;gap:80px;align-items:center;">
+      <div>
+        <div class="section-label">Why We Built This</div>
+        <h2 class="section-title">Built out of<br/><span class="grad-purple">frustration.</span></h2>
+        <p style="font-size:17px;color:rgba(255,255,255,0.5);line-height:1.8;margin-top:20px;margin-bottom:32px;">
+          Every recommendation tutorial online stops at a Jupyter notebook. They show you the math, then leave you with no UI, no real data, no evaluation, no fuzzy search, no posters — nothing deployable.
+        </p>
+        <p style="font-size:17px;color:rgba(255,255,255,0.5);line-height:1.8;margin-bottom:32px;">
+          We built this system end-to-end because we wanted something you could actually <em style="color:rgba(255,255,255,0.8)">show to a user</em> — not just a matrix of similarity scores. That means a real web app, real movie posters, real fuzzy search, and real evaluation numbers.
+        </p>
+        <p style="font-size:17px;color:rgba(255,255,255,0.5);line-height:1.8;">
+          The gap in the market isn't just in production code — it's in <em style="color:rgba(255,255,255,0.8)">transparent hybrid systems</em> that any developer or data scientist can fork, understand, and adapt. This is our answer to that gap.
+        </p>
+      </div>
+
+      <div class="glass-strong" style="border-radius:28px;padding:40px;">
+        <h3 style="font-size:20px;font-weight:700;margin-bottom:28px;letter-spacing:-0.02em;">What's on the Roadmap</h3>
+        <div style="display:flex;flex-direction:column;gap:10px;">
+          <div class="roadmap-pill"><div class="dot"></div><span style="font-size:14px;color:rgba(255,255,255,0.7);">Neural Collaborative Filtering (NCF)</span></div>
+          <div class="roadmap-pill"><div class="dot" style="background:#3b82f6;"></div><span style="font-size:14px;color:rgba(255,255,255,0.7);">BERT-based semantic content features</span></div>
+          <div class="roadmap-pill"><div class="dot" style="background:#06b6d4;"></div><span style="font-size:14px;color:rgba(255,255,255,0.7);">Explainability module ("Because you like Action…")</span></div>
+          <div class="roadmap-pill"><div class="dot" style="background:#22c55e;"></div><span style="font-size:14px;color:rgba(255,255,255,0.7);">Real-time rating ingestion</span></div>
+          <div class="roadmap-pill"><div class="dot" style="background:#f59e0b;"></div><span style="font-size:14px;color:rgba(255,255,255,0.7);">User profiles &amp; persistent sessions</span></div>
+          <div class="roadmap-pill"><div class="dot" style="background:#ec4899;"></div><span style="font-size:14px;color:rgba(255,255,255,0.7);">A/B testing framework</span></div>
+          <div class="roadmap-pill"><div class="dot" style="background:#8b5cf6;"></div><span style="font-size:14px;color:rgba(255,255,255,0.7);">Docker containerization + CI/CD</span></div>
+          <div class="roadmap-pill"><div class="dot" style="background:#f97316;"></div><span style="font-size:14px;color:rgba(255,255,255,0.7);">Multi-language film catalog support</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════ PERFORMANCE ═══════════════════════ -->
+<section style="padding: 60px 48px 100px; background: rgba(255,255,255,0.01);">
+  <div style="max-width:1200px;margin:0 auto;">
+    <div class="reveal" style="text-align:center;margin-bottom:60px;">
+      <div class="section-label" style="text-align:center;">Performance</div>
+      <h2 class="section-title" style="text-align:center;">Numbers that<br/><span class="grad-cyan">speak.</span></h2>
+    </div>
+
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:20px;" class="reveal">
+      <div class="glass-strong" style="border-radius:24px;padding:36px;">
+        <div style="font-size:13px;color:#a855f7;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;margin-bottom:16px;">Dataset Scale</div>
+        <div style="display:flex;flex-direction:column;gap:12px;">
+          <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid rgba(255,255,255,0.06);">
+            <span style="font-size:14px;color:rgba(255,255,255,0.5);">Movies</span>
+            <span style="font-size:16px;font-weight:700;">27,278</span>
+          </div>
+          <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid rgba(255,255,255,0.06);">
+            <span style="font-size:14px;color:rgba(255,255,255,0.5);">Total Ratings</span>
+            <span style="font-size:16px;font-weight:700;">20,000,263</span>
+          </div>
+          <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 0;">
+            <span style="font-size:14px;color:rgba(255,255,255,0.5);">Unique Users</span>
+            <span style="font-size:16px;font-weight:700;">138,493</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="glass-strong" style="border-radius:24px;padding:36px;">
+        <div style="font-size:13px;color:#3b82f6;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;margin-bottom:16px;">Model Config</div>
+        <div style="display:flex;flex-direction:column;gap:12px;">
+          <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid rgba(255,255,255,0.06);">
+            <span style="font-size:14px;color:rgba(255,255,255,0.5);">SVD Latent Factors</span>
+            <span style="font-size:16px;font-weight:700;">30</span>
+          </div>
+          <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid rgba(255,255,255,0.06);">
+            <span style="font-size:14px;color:rgba(255,255,255,0.5);">Training Epochs</span>
+            <span style="font-size:16px;font-weight:700;">5</span>
+          </div>
+          <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 0;">
+            <span style="font-size:14px;color:rgba(255,255,255,0.5);">Training Sample</span>
+            <span style="font-size:16px;font-weight:700;">30,000</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="glass-strong" style="border-radius:24px;padding:36px;">
+        <div style="font-size:13px;color:#06b6d4;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;margin-bottom:16px;">Runtime Performance</div>
+        <div style="display:flex;flex-direction:column;gap:12px;">
+          <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid rgba(255,255,255,0.06);">
+            <span style="font-size:14px;color:rgba(255,255,255,0.5);">Recommendation Speed</span>
+            <span style="font-size:16px;font-weight:700;">&lt; 2s</span>
+          </div>
+          <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid rgba(255,255,255,0.06);">
+            <span style="font-size:14px;color:rgba(255,255,255,0.5);">Fuzzy Match Threshold</span>
+            <span style="font-size:16px;font-weight:700;">75%</span>
+          </div>
+          <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 0;">
+            <span style="font-size:14px;color:rgba(255,255,255,0.5);">Precision@10</span>
+            <span style="font-size:16px;font-weight:700;" class="grad-purple">42%</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════ TEAM ═══════════════════════ -->
+<section id="team" style="padding: 100px 48px;">
+  <div style="max-width:1200px;margin:0 auto;">
+    <div class="aurora" style="width:600px;height:400px;background:rgba(168,85,247,0.08);right:-100px;top:0;"></div>
+
+    <div class="reveal" style="text-align:center;margin-bottom:80px;">
+      <div class="section-label" style="text-align:center;">The Builders</div>
+      <h2 class="section-title" style="text-align:center;">Meet the team<br/><span class="grad-purple">behind the system.</span></h2>
+    </div>
+
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:24px;" class="reveal">
+      <!-- Aman -->
+      <div class="team-card glass-strong glow-purple">
+        <div class="avatar-ring">
+          <div class="avatar-inner">👨‍💻</div>
+        </div>
+        <h3>Aman Asgola</h3>
+        <div class="role">Owner · Lead ML Engineer</div>
+        <p style="font-size:14px;color:rgba(255,255,255,0.45);line-height:1.7;margin-bottom:24px;">
+          Architected the three-engine recommendation system, designed the hybrid fusion layer, and built the full-stack Streamlit application end-to-end.
+        </p>
+        <div style="display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin-bottom:24px;">
+          <span style="padding:4px 12px;border-radius:980px;background:rgba(168,85,247,0.1);border:1px solid rgba(168,85,247,0.2);font-size:11px;color:#a855f7;">Machine Learning</span>
+          <span style="padding:4px 12px;border-radius:980px;background:rgba(168,85,247,0.1);border:1px solid rgba(168,85,247,0.2);font-size:11px;color:#a855f7;">Python</span>
+          <span style="padding:4px 12px;border-radius:980px;background:rgba(168,85,247,0.1);border:1px solid rgba(168,85,247,0.2);font-size:11px;color:#a855f7;">System Design</span>
+        </div>
+        <a href="https://www.linkedin.com/in/amanasgola/" target="_blank" class="linkedin-btn">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg>
+          Connect on LinkedIn
+        </a>
+      </div>
+
+      <!-- Srimon -->
+      <div class="team-card glass-strong glow-blue">
+        <div class="avatar-ring" style="background:linear-gradient(135deg,#3b82f6,#06b6d4,#a855f7);">
+          <div class="avatar-inner">👨‍🔬</div>
+        </div>
+        <h3>Srimon</h3>
+        <div class="role">Co-Builder · ML Collaborator</div>
+        <p style="font-size:14px;color:rgba(255,255,255,0.45);line-height:1.7;margin-bottom:24px;">
+          Co-developed the collaborative filtering pipeline, contributed to model evaluation, data preprocessing, and the architecture design of the hybrid recommendation engine.
+        </p>
+        <div style="display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin-bottom:24px;">
+          <span style="padding:4px 12px;border-radius:980px;background:rgba(59,130,246,0.1);border:1px solid rgba(59,130,246,0.2);font-size:11px;color:#3b82f6;">Collaborative Filtering</span>
+          <span style="padding:4px 12px;border-radius:980px;background:rgba(59,130,246,0.1);border:1px solid rgba(59,130,246,0.2);font-size:11px;color:#3b82f6;">Data Science</span>
+          <span style="padding:4px 12px;border-radius:980px;background:rgba(59,130,246,0.1);border:1px solid rgba(59,130,246,0.2);font-size:11px;color:#3b82f6;">SVD</span>
+        </div>
+        <a href="https://www.linkedin.com/in/srimon" target="_blank" class="linkedin-btn">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg>
+          Connect on LinkedIn
+        </a>
+      </div>
+
+      <!-- Shreya -->
+      <div class="team-card glass-strong" style="box-shadow:0 0 60px rgba(236,72,153,0.2);">
+        <div class="avatar-ring" style="background:linear-gradient(135deg,#ec4899,#a855f7,#f59e0b);">
+          <div class="avatar-inner">👩‍🎨</div>
+        </div>
+        <h3>Shreya Bala</h3>
+        <div class="role">UI/UX Designer</div>
+        <p style="font-size:14px;color:rgba(255,255,255,0.45);line-height:1.7;margin-bottom:24px;">
+          Designed the user experience and visual identity of the application — crafting the interface that makes machine learning feel effortless and intuitive for every user.
+        </p>
+        <div style="display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin-bottom:24px;">
+          <span style="padding:4px 12px;border-radius:980px;background:rgba(236,72,153,0.1);border:1px solid rgba(236,72,153,0.2);font-size:11px;color:#ec4899;">UI Design</span>
+          <span style="padding:4px 12px;border-radius:980px;background:rgba(236,72,153,0.1);border:1px solid rgba(236,72,153,0.2);font-size:11px;color:#ec4899;">UX Research</span>
+          <span style="padding:4px 12px;border-radius:980px;background:rgba(236,72,153,0.1);border:1px solid rgba(236,72,153,0.2);font-size:11px;color:#ec4899;">Visual Identity</span>
+        </div>
+        <a href="https://www.linkedin.com/in/shreya-bala/" target="_blank" class="linkedin-btn">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg>
+          Connect on LinkedIn
+        </a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════ FINAL CTA ═══════════════════════ -->
+<section style="padding: 100px 48px 120px;">
+  <div style="max-width:900px;margin:0 auto;text-align:center;">
+    <div class="aurora" style="width:700px;height:400px;background:rgba(168,85,247,0.12);left:50%;transform:translateX(-50%);top:0;animation-duration:6s;"></div>
+    <div class="reveal" style="position:relative;z-index:2;">
+      <h2 style="font-size:clamp(44px,6vw,80px);font-weight:800;letter-spacing:-0.04em;line-height:1.02;margin-bottom:24px;">
+        <span class="grad-hero">Ready to recommend<br/>the right movie?</span>
+      </h2>
+      <p style="font-size:18px;color:rgba(255,255,255,0.45);line-height:1.7;margin-bottom:52px;font-weight:300;">
+        Fork the repo, add your API key, and have a live recommendation engine running in under 30 minutes.
+      </p>
+      <div style="display:flex;gap:16px;justify-content:center;flex-wrap:wrap;">
+        <a href="https://github.com/AmanAsgola/Movie-Recommendation-System" target="_blank" class="btn-primary" style="font-size:17px;padding:18px 44px;">
+          Clone the Repository →
+        </a>
+        <a href="https://www.linkedin.com/in/amanasgola/" target="_blank" class="btn-secondary" style="font-size:17px;padding:17px 44px;">
+          Contact the Team
+        </a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════ FOOTER ═══════════════════════ -->
+<footer>
+  <div style="margin-bottom:24px;">
+    <span style="font-size:20px;font-weight:700;" class="grad-purple">CineAI</span>
+    <span style="color:rgba(255,255,255,0.15);margin:0 16px;">·</span>
+    <span style="font-size:13px;color:rgba(255,255,255,0.25);">Movie Recommendation System</span>
+  </div>
+  <p style="margin-bottom:12px;">
+    <a href="https://github.com/AmanAsgola/Movie-Recommendation-System" target="_blank">GitHub</a>
+    <span style="color:rgba(255,255,255,0.1);margin:0 12px;">·</span>
+    <a href="https://www.linkedin.com/in/amanasgola/" target="_blank">Aman Asgola</a>
+    <span style="color:rgba(255,255,255,0.1);margin:0 12px;">·</span>
+    <a href="https://www.linkedin.com/in/srimon" target="_blank">Srimon</a>
+    <span style="color:rgba(255,255,255,0.1);margin:0 12px;">·</span>
+    <a href="https://www.linkedin.com/in/shreya-bala/" target="_blank">Shreya Bala</a>
+  </p>
+  <p style="margin-top:16px;">© 2026 Aman Asgola · MIT Licensed · Built with passion for data, film, and open-source.</p>
+</footer>
+
+<!-- ═══════════════════════ SCRIPTS ═══════════════════════ -->
+<script>
+/* ── Three.js Particle Background ── */
+(function() {
+  const canvas = document.getElementById('bg-canvas');
+  const renderer = new THREE.WebGLRenderer({ canvas, alpha: true, antialias: true });
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+  renderer.setSize(window.innerWidth, window.innerHeight);
+
+  const scene = new THREE.Scene();
+  const camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.1, 1000);
+  camera.position.z = 50;
+
+  // Particle geometry
+  const N = 1800;
+  const geo = new THREE.BufferGeometry();
+  const pos = new Float32Array(N * 3);
+  const col = new Float32Array(N * 3);
+  const sizes = new Float32Array(N);
+
+  const colors = [
+    [0.66, 0.33, 0.97], // purple
+    [0.23, 0.51, 0.96], // blue
+    [0.02, 0.71, 0.83], // cyan
+    [0.93, 0.29, 0.60], // pink
+  ];
+
+  for (let i = 0; i < N; i++) {
+    pos[i*3]   = (Math.random() - 0.5) * 200;
+    pos[i*3+1] = (Math.random() - 0.5) * 200;
+    pos[i*3+2] = (Math.random() - 0.5) * 120;
+    const c = colors[Math.floor(Math.random() * colors.length)];
+    col[i*3]   = c[0];
+    col[i*3+1] = c[1];
+    col[i*3+2] = c[2];
+    sizes[i] = Math.random() * 2.5 + 0.5;
+  }
+
+  geo.setAttribute('position', new THREE.BufferAttribute(pos, 3));
+  geo.setAttribute('color', new THREE.BufferAttribute(col, 3));
+  geo.setAttribute('size', new THREE.BufferAttribute(sizes, 1));
+
+  const mat = new THREE.PointsMaterial({
+    size: 0.8,
+    vertexColors: true,
+    transparent: true,
+    opacity: 0.5,
+    sizeAttenuation: true,
+  });
+
+  const points = new THREE.Points(geo, mat);
+  scene.add(points);
+
+  let mouseX = 0, mouseY = 0;
+  document.addEventListener('mousemove', e => {
+    mouseX = (e.clientX / window.innerWidth - 0.5) * 0.4;
+    mouseY = (e.clientY / window.innerHeight - 0.5) * 0.3;
+  });
+
+  window.addEventListener('resize', () => {
+    camera.aspect = window.innerWidth / window.innerHeight;
+    camera.updateProjectionMatrix();
+    renderer.setSize(window.innerWidth, window.innerHeight);
+  });
+
+  let t = 0;
+  function animate() {
+    requestAnimationFrame(animate);
+    t += 0.0006;
+    points.rotation.y = t + mouseX;
+    points.rotation.x = t * 0.4 + mouseY;
+    renderer.render(scene, camera);
+  }
+  animate();
+})();
+
+/* ── Scroll reveal ── */
+const reveals = document.querySelectorAll('.reveal');
+const obs = new IntersectionObserver((entries) => {
+  entries.forEach((e, i) => {
+    if (e.isIntersecting) {
+      setTimeout(() => e.target.classList.add('visible'), i * 80);
+      obs.unobserve(e.target);
+    }
+  });
+}, { threshold: 0.08, rootMargin: '0px 0px -60px 0px' });
+
+reveals.forEach(el => obs.observe(el));
+
+/* ── Counter animation ── */
+function animateCounter(el) {
+  const target = parseInt(el.dataset.target);
+  const duration = 1800;
+  const start = performance.now();
+  function tick(now) {
+    const p = Math.min((now - start) / duration, 1);
+    const ease = 1 - Math.pow(1 - p, 4);
+    el.textContent = Math.floor(ease * target).toLocaleString();
+    if (p < 1) requestAnimationFrame(tick);
+  }
+  requestAnimationFrame(tick);
+}
+
+const counterObs = new IntersectionObserver(entries => {
+  entries.forEach(e => {
+    if (e.isIntersecting) {
+      animateCounter(e.target);
+      counterObs.unobserve(e.target);
+    }
+  });
+}, { threshold: 0.5 });
+
+document.querySelectorAll('.counter').forEach(el => counterObs.observe(el));
+
+/* ── Nav scroll effect ── */
+const nav = document.getElementById('nav');
+window.addEventListener('scroll', () => {
+  if (window.scrollY > 40) {
+    nav.style.background = 'rgba(0,0,0,0.75)';
+    nav.style.boxShadow = '0 1px 40px rgba(0,0,0,0.5)';
+  } else {
+    nav.style.background = 'rgba(0,0,0,0.4)';
+    nav.style.boxShadow = 'none';
+  }
+});
+
+/* ── 3D movie card mouse parallax ── */
+document.querySelectorAll('.movie-card-3d').forEach(card => {
+  const base = card.style.transform;
+  card.addEventListener('mousemove', e => {
+    const rect = card.getBoundingClientRect();
+    const cx = rect.left + rect.width / 2;
+    const cy = rect.top + rect.height / 2;
+    const rx = (e.clientY - cy) / rect.height * -20;
+    const ry = (e.clientX - cx) / rect.width * 20;
+    card.style.transform = `${base} rotateX(${rx}deg) rotateY(${ry}deg) translateY(-16px) scale(1.06)`;
+  });
+  card.addEventListener('mouseleave', () => {
+    card.style.transform = base;
+  });
+});
+
+/* ── Hero cards gentle float ── */
+const cards = document.querySelectorAll('.movie-card-3d');
+function floatCards() {
+  const t = Date.now() / 1000;
+  cards.forEach((card, i) => {
+    const base = card.getAttribute('data-base-transform') || card.style.transform;
+    if (!card.getAttribute('data-base-transform')) {
+      card.setAttribute('data-base-transform', card.style.transform);
+    }
+    const offset = Math.sin(t + i * 0.7) * 6;
+    const rot = parseFloat(card.style.transform.match(/rotate\(([^)]+)deg\)/)?.[1] || '0');
+    card.style.transform = `rotate(${rot}deg) translateY(${offset}px)`;
+  });
+  requestAnimationFrame(floatCards);
+}
+floatCards();
+</script>
+</body>
+</html>
