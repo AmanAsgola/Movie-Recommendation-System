@@ -191,10 +191,14 @@ if __name__ == "__main__":
         hybrid_model, ratings, movies, sample_users=30, k=10
     )
 
-    # ── Rating accuracy ───────────────────────────────────────────────────────
+    # ── Rating accuracy (RMSE) ────────────────────────────────────────────────
+    # iALS produces ranking scores, not rating values — RMSE needs SVD.
+    # We train a lightweight SVD alongside iALS purely for RMSE reporting.
     print(_col(f"\n  {'─'*68}", _DIM))
-    print("  Computing RMSE on held-out rating samples…")
-    rmse = compute_rmse(collab_model, ratings)
+    print("  Computing RMSE (SVD rating predictor)…")
+    from collaborative import CollaborativeRecommender as CR
+    svd_model_for_rmse = CR(use_ials=False)
+    rmse = compute_rmse(svd_model_for_rmse, ratings)
 
     # ── Print final dashboard ─────────────────────────────────────────────────
     log_run(precision, recall, ndcg, rmse, n_users=30)

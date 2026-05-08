@@ -193,5 +193,62 @@
       "ndcg_pct": -5.82,
       "rmse_pct": null
     }
+  },
+  {
+    "run": 12,
+    "timestamp": "2026-05-08 12:02:25",
+    "commit": "e28fd72",
+    "changes": "Add color-coded evaluation dashboard with RMSE and plain-English grading",
+    "users_evaluated": 30,
+    "scores": {
+      "precision_at_10": 0.1933,
+      "recall_at_10": 0.0115,
+      "ndcg_at_10": 0.208,
+      "rmse": 0.7127
+    },
+    "improvement_vs_previous": {
+      "precision_pct": 0.02,
+      "recall_pct": 0.14,
+      "ndcg_pct": 0.02,
+      "rmse_pct": -0.0
+    }
+  },
+  {
+    "run": 13,
+    "timestamp": "2026-05-08 12:16:51",
+    "commit": "e28fd72",
+    "changes": "Add color-coded evaluation dashboard with RMSE and plain-English grading",
+    "users_evaluated": 30,
+    "scores": {
+      "precision_at_10": 0.1767,
+      "recall_at_10": 0.01,
+      "ndcg_at_10": 0.1853,
+      "rmse": 2.5938
+    },
+    "improvement_vs_previous": {
+      "precision_pct": -8.6,
+      "recall_pct": -13.16,
+      "ndcg_pct": -10.91,
+      "rmse_pct": 263.94
+    }
+  },
+  {
+    "run": 14,
+    "timestamp": "2026-05-08 12:23:54",
+    "commit": "e28fd72",
+    "changes": "Add color-coded evaluation dashboard with RMSE and plain-English grading",
+    "users_evaluated": 30,
+    "scores": {
+      "precision_at_10": 0.21,
+      "recall_at_10": 0.0124,
+      "ndcg_at_10": 0.2185,
+      "rmse": 0.7127
+    },
+    "improvement_vs_previous": {
+      "precision_pct": 18.85,
+      "recall_pct": 24.09,
+      "ndcg_pct": 17.92,
+      "rmse_pct": -72.52
+    }
   }
 ]
