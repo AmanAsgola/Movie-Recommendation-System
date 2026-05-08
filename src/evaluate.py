@@ -175,11 +175,11 @@ if __name__ == "__main__":
     ratings = pd.read_csv("data/ratings.csv")
 
     from content_based  import ContentBasedRecommender
-    from collaborative  import CollaborativeRecommender
+    from ncf_model      import NCFRecommender
     from hybrid         import HybridRecommender
 
     content_model = ContentBasedRecommender()
-    collab_model  = CollaborativeRecommender()
+    collab_model  = NCFRecommender()            # NCF/NeuMF + BPR loss
     hybrid_model  = HybridRecommender(content_model, collab_model, movies)
 
     print(_bold("\n  SANITY TEST — 'Toy Story' recommendations:"))
