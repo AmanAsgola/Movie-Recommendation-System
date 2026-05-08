@@ -71,7 +71,7 @@ class NCFRecommender:
     def __init__(self, ratings_path="data/ratings.csv",
                  emb_size=64, mlp_dims=(128, 64, 32),
                  n_epochs=15, batch_size=8192, lr=5e-4, reg=1e-5,
-                 top_items=20_000, top_users=12_000):
+                 top_items=20_000, top_users=12_000, neg_per_pos=2):
 
         ratings = pd.read_csv(ratings_path)[['userId', 'movieId', 'rating']]
 
@@ -111,31 +111,35 @@ class NCFRecommender:
         opt   = optim.Adam(net.parameters(), lr=lr, weight_decay=reg)
         sched = optim.lr_scheduler.CosineAnnealingLR(opt, T_max=n_epochs)
 
-        print(f"  [NCF] {n_u} users · {n_i} items · "
-              f"emb={emb_size} · epochs={n_epochs} · pos_pairs={n_pos:,}")
+        # neg_per_pos: sample multiple negatives per positive for stronger ranking signal
+        n_train = n_pos * neg_per_pos   # total training triples per epoch
+
+        print(f"  [NCF] {n_u} users · {n_i} items · emb={emb_size} · "
+              f"epochs={n_epochs} · pos_pairs={n_pos:,} · neg×{neg_per_pos}")
 
         # ── Training loop ─────────────────────────────────────────────────────
         net.train()
         for epoch in range(n_epochs):
             t0 = time.time()
 
-            # Pre-sample negatives for this epoch (fast rejection)
-            neg_i = np.random.randint(0, n_i, n_pos)
-            # Fix collisions (vectorised where possible)
-            for idx in range(n_pos):
-                u = int(pos_u[idx])
+            # Pre-sample neg_per_pos negatives per positive (with rejection)
+            rep_u = np.tile(pos_u, neg_per_pos)   # repeat positives neg_per_pos times
+            rep_i = np.tile(pos_i, neg_per_pos)
+            neg_i = np.random.randint(0, n_i, n_train)
+            for idx in range(n_train):
+                u = int(rep_u[idx])
                 while neg_i[idx] in user_pos_set[u]:
                     neg_i[idx] = np.random.randint(0, n_i)
 
-            # Shuffle
-            perm  = np.random.permutation(n_pos)
-            pu_t  = torch.from_numpy(pos_u[perm])
-            pi_t  = torch.from_numpy(pos_i[perm])
+            # Shuffle all triples together
+            perm  = np.random.permutation(n_train)
+            pu_t  = torch.from_numpy(rep_u[perm])
+            pi_t  = torch.from_numpy(rep_i[perm])
             ni_t  = torch.from_numpy(neg_i[perm])
 
             total_loss, n_batches = 0.0, 0
-            for s in range(0, n_pos, batch_size):
-                e = min(s + batch_size, n_pos)
+            for s in range(0, n_train, batch_size):
+                e = min(s + batch_size, n_train)
                 u_b  = pu_t[s:e]
                 pi_b = pi_t[s:e]
                 ni_b = ni_t[s:e]

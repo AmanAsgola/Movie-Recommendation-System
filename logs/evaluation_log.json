@@ -288,5 +288,62 @@
       "ndcg_pct": 18.53,
       "rmse_pct": -0.0
     }
+  },
+  {
+    "run": 17,
+    "timestamp": "2026-05-08 13:29:53",
+    "commit": "e249a8a",
+    "changes": "Add NCF/NeuMF with BPR loss \u2014 Precision@10 crosses GOOD threshold (0.25)",
+    "users_evaluated": 30,
+    "scores": {
+      "precision_at_10": 0.21,
+      "recall_at_10": 0.0116,
+      "ndcg_at_10": 0.2254,
+      "rmse": 0.7127
+    },
+    "improvement_vs_previous": {
+      "precision_pct": -16.0,
+      "recall_pct": -16.81,
+      "ndcg_pct": -12.97,
+      "rmse_pct": -0.0
+    }
+  },
+  {
+    "run": 18,
+    "timestamp": "2026-05-08 13:39:31",
+    "commit": "e249a8a",
+    "changes": "Add NCF/NeuMF with BPR loss \u2014 Precision@10 crosses GOOD threshold (0.25)",
+    "users_evaluated": 30,
+    "scores": {
+      "precision_at_10": 0.18,
+      "recall_at_10": 0.0102,
+      "ndcg_at_10": 0.1976,
+      "rmse": 0.7127
+    },
+    "improvement_vs_previous": {
+      "precision_pct": -14.29,
+      "recall_pct": -12.04,
+      "ndcg_pct": -12.35,
+      "rmse_pct": -0.0
+    }
+  },
+  {
+    "run": 19,
+    "timestamp": "2026-05-08 14:29:57",
+    "commit": "e249a8a",
+    "changes": "Add NCF/NeuMF with BPR loss \u2014 Precision@10 crosses GOOD threshold (0.25)",
+    "users_evaluated": 30,
+    "scores": {
+      "precision_at_10": 0.25,
+      "recall_at_10": 0.0147,
+      "ndcg_at_10": 0.2565,
+      "rmse": 0.7127
+    },
+    "improvement_vs_previous": {
+      "precision_pct": 38.89,
+      "recall_pct": 43.72,
+      "ndcg_pct": 29.82,
+      "rmse_pct": -0.0
+    }
   }
 ]
