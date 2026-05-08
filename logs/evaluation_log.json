@@ -345,5 +345,24 @@
       "ndcg_pct": 29.82,
       "rmse_pct": -0.0
     }
+  },
+  {
+    "run": 20,
+    "timestamp": "2026-05-08 14:53:50",
+    "commit": "0dfe0e2",
+    "changes": "Add NCF+iALS ensemble \u2014 stable GOOD on Precision@10 and NDCG@10",
+    "users_evaluated": 30,
+    "scores": {
+      "precision_at_10": 0.2567,
+      "recall_at_10": 0.0147,
+      "ndcg_at_10": 0.2698,
+      "rmse": 0.7127
+    },
+    "improvement_vs_previous": {
+      "precision_pct": 2.67,
+      "recall_pct": -0.26,
+      "ndcg_pct": 5.19,
+      "rmse_pct": -0.0
+    }
   }
 ]

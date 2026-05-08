@@ -178,8 +178,8 @@ if __name__ == "__main__":
     from collaborative  import EnsembleRecommender
     from hybrid         import HybridRecommender
 
-    content_model = ContentBasedRecommender()
-    collab_model  = EnsembleRecommender()       # NCF + iALS ensemble
+    content_model = ContentBasedRecommender()   # SBERT two-stage
+    collab_model  = EnsembleRecommender()       # NCF (MPS) + iALS ensemble
     hybrid_model  = HybridRecommender(content_model, collab_model, movies)
 
     print(_bold("\n  SANITY TEST — 'Toy Story' recommendations:"))

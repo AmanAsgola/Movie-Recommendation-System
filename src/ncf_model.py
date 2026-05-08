@@ -2,11 +2,9 @@
 Neural Collaborative Filtering (NCF/NeuMF) — He et al. 2017
 + BPR pairwise ranking loss — Rendle et al. 2009
 
-Fast CPU implementation:
-  - Items capped to top-20K most rated (cold items have unreliable embeddings)
-  - Negatives pre-sampled per epoch (no DataLoader while-loop overhead)
-  - Pure tensor mini-batch loop — ~10-30s total training on CPU
-  - emb_size=64, MLP 128→64→32 for balance of speed and capacity
+Device: auto-selects MPS (Apple M-series) > CUDA > CPU.
+  On Mac M5 chip, MPS gives 5-10× speedup over CPU.
+  emb_size=64, MLP 128→64→32, 15 epochs ≈ 90s total on M5 MPS.
 
 Training: BPR loss = -log σ(score(u, pos) − score(u, neg))
 Optimised directly for ranking, not rating prediction.
@@ -18,6 +16,15 @@ import pandas as pd
 import torch
 import torch.nn as nn
 import torch.optim as optim
+
+
+# ── Device: MPS (Apple M-series GPU) > CUDA > CPU ────────────────────────────
+def _best_device():
+    if torch.backends.mps.is_available():
+        return torch.device("mps")
+    if torch.cuda.is_available():
+        return torch.device("cuda")
+    return torch.device("cpu")
 
 
 # ─────────────────────────────────────────────────────────────────────────────
@@ -48,14 +55,16 @@ class NeuMF(nn.Module):
         return self.out(torch.cat([gmf, mlp], dim=1)).squeeze(-1)
 
     @torch.no_grad()
-    def score_all(self, u_idx, n_items, batch=8192):
-        """Score all n_items for user u_idx. Returns numpy array."""
+    def score_all(self, u_idx, n_items, device=None, batch=8192):
+        """Score all n_items for user u_idx. Returns CPU numpy array."""
+        if device is None:
+            device = next(self.parameters()).device
         scores = np.empty(n_items, dtype=np.float32)
-        u_t = torch.tensor([u_idx])
+        u_t = torch.tensor([u_idx], device=device)
         for s in range(0, n_items, batch):
             e   = min(s + batch, n_items)
-            i_t = torch.arange(s, e)
-            scores[s:e] = self(u_t.expand(e - s), i_t).numpy()
+            i_t = torch.arange(s, e, device=device)
+            scores[s:e] = self(u_t.expand(e - s), i_t).cpu().numpy()
         return scores
 
 
@@ -106,24 +115,26 @@ class NCFRecommender:
         for u, i in zip(pos_u, pos_i):
             user_pos_set[u].add(int(i))
 
+        # ── Device: MPS (Apple M-series) > CUDA > CPU ───────────────────────
+        device = _best_device()
+
         # ── Model + optimiser ─────────────────────────────────────────────────
-        net   = NeuMF(n_u, n_i, emb_size=emb_size, mlp_dims=mlp_dims)
+        net   = NeuMF(n_u, n_i, emb_size=emb_size, mlp_dims=mlp_dims).to(device)
         opt   = optim.Adam(net.parameters(), lr=lr, weight_decay=reg)
         sched = optim.lr_scheduler.CosineAnnealingLR(opt, T_max=n_epochs)
 
-        # neg_per_pos: sample multiple negatives per positive for stronger ranking signal
-        n_train = n_pos * neg_per_pos   # total training triples per epoch
+        n_train = n_pos * neg_per_pos
 
         print(f"  [NCF] {n_u} users · {n_i} items · emb={emb_size} · "
-              f"epochs={n_epochs} · pos_pairs={n_pos:,} · neg×{neg_per_pos}")
+              f"epochs={n_epochs} · pos_pairs={n_pos:,} · neg×{neg_per_pos} · "
+              f"device={device}")
 
         # ── Training loop ─────────────────────────────────────────────────────
         net.train()
         for epoch in range(n_epochs):
             t0 = time.time()
 
-            # Pre-sample neg_per_pos negatives per positive (with rejection)
-            rep_u = np.tile(pos_u, neg_per_pos)   # repeat positives neg_per_pos times
+            rep_u = np.tile(pos_u, neg_per_pos)
             rep_i = np.tile(pos_i, neg_per_pos)
             neg_i = np.random.randint(0, n_i, n_train)
             for idx in range(n_train):
@@ -131,15 +142,14 @@ class NCFRecommender:
                 while neg_i[idx] in user_pos_set[u]:
                     neg_i[idx] = np.random.randint(0, n_i)
 
-            # Shuffle all triples together
             perm  = np.random.permutation(n_train)
-            pu_t  = torch.from_numpy(rep_u[perm])
-            pi_t  = torch.from_numpy(rep_i[perm])
-            ni_t  = torch.from_numpy(neg_i[perm])
+            pu_t  = torch.from_numpy(rep_u[perm]).to(device)
+            pi_t  = torch.from_numpy(rep_i[perm]).to(device)
+            ni_t  = torch.from_numpy(neg_i[perm]).to(device)
 
             total_loss, n_batches = 0.0, 0
             for s in range(0, n_train, batch_size):
-                e = min(s + batch_size, n_train)
+                e    = min(s + batch_size, n_train)
                 u_b  = pu_t[s:e]
                 pi_b = pi_t[s:e]
                 ni_b = ni_t[s:e]
@@ -159,9 +169,10 @@ class NCFRecommender:
                   f"BPR-loss={total_loss/n_batches:.4f}  {elapsed:.1f}s", flush=True)
 
         net.eval()
-        self._net   = net
-        self._n_i   = n_i
-        self.model  = self   # expose self as .model for hybrid.py / evaluate.py
+        self._net    = net
+        self._device = device
+        self._n_i    = n_i
+        self.model   = self
 
     # ── Model interface (same as SVDModel / IALSModel) ────────────────────────
 
@@ -174,7 +185,8 @@ class NCFRecommender:
     def predict_for_user(self, user_id):
         if user_id not in self._user_map:
             return {}
-        scores = self._net.score_all(self._user_map[user_id], self._n_i)
+        scores = self._net.score_all(self._user_map[user_id], self._n_i,
+                                     device=self._device)
         return {self._idx_item[i]: float(scores[i]) for i in range(self._n_i)}
 
     def predict(self, user_id, movie_id):
@@ -182,10 +194,10 @@ class NCFRecommender:
         p = _P()
         if user_id not in self._user_map or movie_id not in self._item_map:
             p.est = self.global_mean; return p
-        u = torch.tensor([self._user_map[user_id]])
-        i = torch.tensor([self._item_map[movie_id]])
+        u = torch.tensor([self._user_map[user_id]], device=self._device)
+        i = torch.tensor([self._item_map[movie_id]], device=self._device)
         with torch.no_grad():
-            p.est = float(self._net(u, i))
+            p.est = float(self._net(u, i).cpu())
         return p
 
     def recommend_for_user(self, user_id, movies_df, top_n=10):
