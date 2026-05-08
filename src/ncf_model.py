@@ -10,10 +10,13 @@ Training: BPR loss = -log σ(score(u, pos) − score(u, neg))
 Optimised directly for ranking, not rating prediction.
 """
 
+import os
 import time
 import numpy as np
 import pandas as pd
 import torch
+
+_DATA_DIR = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "data")
 import torch.nn as nn
 import torch.optim as optim
 
@@ -77,11 +80,13 @@ class NCFRecommender:
     Exposes .model = self so hybrid.py / evaluate.py work unchanged.
     """
 
-    def __init__(self, ratings_path="data/ratings.csv",
+    def __init__(self, ratings_path=None,
                  emb_size=64, mlp_dims=(128, 64, 32),
                  n_epochs=15, batch_size=8192, lr=5e-4, reg=1e-5,
                  top_items=20_000, top_users=12_000, neg_per_pos=2):
 
+        if ratings_path is None:
+            ratings_path = os.path.join(_DATA_DIR, "ratings.csv")
         ratings = pd.read_csv(ratings_path)[['userId', 'movieId', 'rating']]
 
         # ── Select top active users ───────────────────────────────────────────

@@ -1,14 +1,19 @@
+import os
 import numpy as np
 import pandas as pd
 from scipy.sparse import csr_matrix
 from scipy.sparse.linalg import svds
 from scipy.linalg import solve as scipy_solve
 
+_DATA_DIR = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "data")
+
 
 # ─────────────────────────────────────────────────────────────────────────────
 # Data loader
 # ─────────────────────────────────────────────────────────────────────────────
-def load_data(path="data/ratings.csv"):
+def load_data(path=None):
+    if path is None:
+        path = os.path.join(_DATA_DIR, "ratings.csv")
     ratings = pd.read_csv(path)
     return ratings[['userId', 'movieId', 'rating']]
 
@@ -187,7 +192,9 @@ class SVDModel:
 # CollaborativeRecommender — uses iALS by default
 # ─────────────────────────────────────────────────────────────────────────────
 class CollaborativeRecommender:
-    def __init__(self, ratings_path="data/ratings.csv", use_ials=True):
+    def __init__(self, ratings_path=None, use_ials=True):
+        if ratings_path is None:
+            ratings_path = os.path.join(_DATA_DIR, "ratings.csv")
         ratings = load_data(ratings_path)
 
         # Top-12K most active users for dense, reliable latent factors
@@ -231,7 +238,9 @@ class EnsembleRecommender:
     Exposes .model = self so hybrid.py works unchanged.
     """
 
-    def __init__(self, ratings_path="data/ratings.csv"):
+    def __init__(self, ratings_path=None):
+        if ratings_path is None:
+            ratings_path = os.path.join(_DATA_DIR, "ratings.csv")
         from ncf_model import NCFRecommender
 
         print("  [Ensemble] Training NCF model…")

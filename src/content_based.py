@@ -20,11 +20,13 @@ import pandas as pd
 from rapidfuzz import process
 from sklearn.neighbors import NearestNeighbors
 
-METADATA_PATH      = "data/movies_metadata.csv"
-CACHE_GENRE        = "data/sbert_genre_embeddings.npy"
-CACHE_GENRE_IDS    = "data/sbert_genre_ids.npy"
-CACHE_RICH         = "data/sbert_rich_embeddings.npy"
-CACHE_RICH_IDS     = "data/sbert_rich_ids.npy"
+_DATA_DIR = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "data")
+
+METADATA_PATH      = os.path.join(_DATA_DIR, "movies_metadata.csv")
+CACHE_GENRE        = os.path.join(_DATA_DIR, "sbert_genre_embeddings.npy")
+CACHE_GENRE_IDS    = os.path.join(_DATA_DIR, "sbert_genre_ids.npy")
+CACHE_RICH         = os.path.join(_DATA_DIR, "sbert_rich_embeddings.npy")
+CACHE_RICH_IDS     = os.path.join(_DATA_DIR, "sbert_rich_ids.npy")
 SBERT_MODEL        = "all-MiniLM-L6-v2"   # 80 MB, 384-dim, fast + accurate
 
 
@@ -60,7 +62,7 @@ def _encode(model, texts, batch_size=256, desc="encoding"):
 
 
 class ContentBasedRecommender:
-    def __init__(self, movies_path="data/movies.csv"):
+    def __init__(self, movies_path=os.path.join(_DATA_DIR, "movies.csv")):
         self.movies = pd.read_csv(movies_path).dropna().drop_duplicates(subset="title")
         self.movies['clean_title'] = (
             self.movies['title']

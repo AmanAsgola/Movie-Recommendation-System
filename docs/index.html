@@ -37,7 +37,7 @@
     .compare-row:hover td{background:rgba(255,255,255,.02)}
     .metric-card{border-radius:20px;padding:32px 28px;transition:transform .3s}
     .metric-card:hover{transform:translateY(-8px)}
-    .sprint-card{border-radius:20px;padding:28px;border-left:3px solid}
+    .phase-card{border-radius:20px;padding:28px;border-left:3px solid}
     .roadmap-item{display:flex;align-items:center;gap:12px;padding:14px 18px;border-radius:12px;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.06);transition:all .2s}
     .roadmap-item:hover{background:rgba(168,85,247,.06);border-color:rgba(168,85,247,.2);transform:translateX(6px)}
     footer{border-top:1px solid rgba(255,255,255,.06);padding:60px 48px 40px;text-align:center;position:relative;z-index:2}
@@ -52,10 +52,10 @@
 <nav>
   <span style="font-size:20px;font-weight:700;" class="gp">CineAI</span>
   <ul style="display:flex;gap:32px;list-style:none">
-    <li><a href="#story" style="color:rgba(255,255,255,.6);text-decoration:none;font-size:14px">Our Journey</a></li>
+    <li><a href="#story" style="color:rgba(255,255,255,.6);text-decoration:none;font-size:14px">The Story</a></li>
     <li><a href="#metrics" style="color:rgba(255,255,255,.6);text-decoration:none;font-size:14px">How It Works</a></li>
-    <li><a href="#vs-netflix" style="color:rgba(255,255,255,.6);text-decoration:none;font-size:14px">vs Netflix</a></li>
-    <li><a href="#business" style="color:rgba(255,255,255,.6);text-decoration:none;font-size:14px">Business</a></li>
+    <li><a href="#vs-netflix" style="color:rgba(255,255,255,.6);text-decoration:none;font-size:14px">Benchmarks</a></li>
+    <li><a href="#business" style="color:rgba(255,255,255,.6);text-decoration:none;font-size:14px">Product</a></li>
     <li><a href="#team" style="color:rgba(255,255,255,.6);text-decoration:none;font-size:14px">Team</a></li>
     <li><a href="https://github.com/AmanAsgola/Movie-Recommendation-System" target="_blank" style="color:#fff;text-decoration:none;font-size:13px;font-weight:500;padding:8px 20px;border-radius:980px;background:linear-gradient(135deg,#a855f7,#3b82f6)">GitHub →</a></li>
   </ul>
@@ -75,7 +75,7 @@
   </h1>
 
   <p class="reveal" style="font-size:clamp(16px,2vw,20px);color:rgba(255,255,255,.55);max-width:640px;line-height:1.7;margin-bottom:16px;font-weight:300">
-    An AI recommendation engine built from scratch that achieved a <strong style="color:#a855f7">5,034% accuracy improvement</strong> — and beat the $1M Netflix Prize winner on rating prediction.
+    An AI recommendation engine built from scratch — achieving a <strong style="color:#a855f7">5,034% accuracy improvement</strong> and beating the $1M Netflix Prize winner on rating prediction.
   </p>
 
   <!-- KEY STAT BADGES -->
@@ -86,41 +86,52 @@
   </div>
 
   <div class="hero-btns reveal" style="display:flex;gap:16px;flex-wrap:wrap;justify-content:center">
-    <a href="#story" class="btn-p">See the Journey</a>
+    <a href="#story" class="btn-p">See the Story</a>
     <a href="https://github.com/AmanAsgola/Movie-Recommendation-System" target="_blank" class="btn-s">★ Star on GitHub</a>
   </div>
 </section>
 
-<!-- EXPLAIN LIKE 5 -->
+<!-- WHAT WE BUILT -->
 <section class="z2" style="padding:100px 48px">
   <div style="max-width:1100px;margin:0 auto">
-    <div class="reveal" style="text-align:center;margin-bottom:60px">
-      <div style="font-size:12px;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:#a855f7;margin-bottom:16px">Plain English</div>
-      <h2 style="font-size:clamp(36px,5vw,60px);font-weight:800;letter-spacing:-.04em;line-height:1.05">What did we actually build?<br/><span class="gc">Explained simply.</span></h2>
+
+    <div class="reveal" style="margin-bottom:72px">
+      <div style="font-size:12px;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:#a855f7;margin-bottom:20px">The System</div>
+      <h2 style="font-size:clamp(40px,5vw,64px);font-weight:800;letter-spacing:-.04em;line-height:1.05;max-width:820px;margin-bottom:24px">
+        A recommendation engine that understands <span class="gc">what you mean,</span> not just what you type.
+      </h2>
+      <p style="font-size:18px;color:rgba(255,255,255,.5);max-width:700px;line-height:1.8;font-weight:300">
+        CineAI combines deep learning, semantic understanding, and 20 million ratings to surface the right film at the right moment — ranked from a catalogue of 27,278 titles, with no shortcuts.
+      </p>
     </div>
 
-    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:20px" class="reveal">
-      <div class="glass2" style="border-radius:24px;padding:40px">
-        <div style="font-size:48px;margin-bottom:20px">🧒</div>
-        <h3 style="font-size:20px;font-weight:700;margin-bottom:12px">For a 5-year-old</h3>
-        <p style="font-size:15px;color:rgba(255,255,255,.6);line-height:1.8">
-          Imagine a video store with 27,000 movies. A <strong style="color:#fff">bad clerk</strong> picks randomly — you hate everything. A <strong style="color:#a855f7">great clerk</strong> reads the PLOT of every movie, knows what your friends liked, and picks exactly what you'll love. We built the great clerk.
+    <!-- THREE PILLARS -->
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:24px" class="reveal">
+
+      <div class="glass2" style="border-radius:24px;padding:44px 40px">
+        <div style="width:48px;height:48px;border-radius:14px;background:rgba(168,85,247,.15);display:flex;align-items:center;justify-content:center;font-size:22px;margin-bottom:28px">🎯</div>
+        <h3 style="font-size:19px;font-weight:700;margin-bottom:14px;letter-spacing:-.02em">Personalised, not popular</h3>
+        <p style="font-size:15px;color:rgba(255,255,255,.55);line-height:1.8">
+          Every recommendation is ranked against the full 27,278-film catalogue using a learned preference model — not trending lists, not cached results. From 10 suggestions, a user finds <strong style="color:#a855f7">2.5 films they genuinely love</strong>. That number started at near-zero and was engineered upward across 20 documented iterations.
         </p>
       </div>
-      <div class="glass2" style="border-radius:24px;padding:40px">
-        <div style="font-size:48px;margin-bottom:20px">📊</div>
-        <h3 style="font-size:20px;font-weight:700;margin-bottom:12px">For a Product Manager</h3>
-        <p style="font-size:15px;color:rgba(255,255,255,.6);line-height:1.8">
-          We show a user 10 movies. On average, <strong style="color:#22c55e">2.5 of them</strong> are ones they'll genuinely love. Our rating predictions are off by <strong style="color:#22c55e">only ±0.71 stars</strong> on a 1–5 scale. We track every experiment in a live evaluation log and improve with every sprint.
+
+      <div class="glass2" style="border-radius:24px;padding:44px 40px">
+        <div style="width:48px;height:48px;border-radius:14px;background:rgba(6,182,212,.15);display:flex;align-items:center;justify-content:center;font-size:22px;margin-bottom:28px">🧠</div>
+        <h3 style="font-size:19px;font-weight:700;margin-bottom:14px;letter-spacing:-.02em">Meaning, not keywords</h3>
+        <p style="font-size:15px;color:rgba(255,255,255,.55);line-height:1.8">
+          The content layer runs on <strong style="color:#06b6d4">Sentence-BERT</strong> — a transformer model that encodes plot, cast, director, and genre as a unified 384-dimensional semantic vector. It understands that <em>"psychological thriller"</em> and <em>"dark crime drama"</em> describe the same emotional experience. Keyword matching cannot.
         </p>
       </div>
-      <div class="glass2" style="border-radius:24px;padding:40px">
-        <div style="font-size:48px;margin-bottom:20px">🔬</div>
-        <h3 style="font-size:20px;font-weight:700;margin-bottom:12px">For a FAANG Engineer</h3>
-        <p style="font-size:15px;color:rgba(255,255,255,.6);line-height:1.8">
-          <strong style="color:#fff">NCF/NeuMF + BPR loss</strong> (PyTorch, MPS-accelerated) fused with <strong style="color:#fff">iALS</strong> via rank aggregation, re-ranked by <strong style="color:#fff">Sentence-BERT</strong> semantic similarity on a two-stage TMDB-enriched content pipeline. Trained on 20M ratings, 27K items, 12K active users.
+
+      <div class="glass2" style="border-radius:24px;padding:44px 40px">
+        <div style="width:48px;height:48px;border-radius:14px;background:rgba(34,197,94,.15);display:flex;align-items:center;justify-content:center;font-size:22px;margin-bottom:28px">📐</div>
+        <h3 style="font-size:19px;font-weight:700;margin-bottom:14px;letter-spacing:-.02em">Ranked, not predicted</h3>
+        <p style="font-size:15px;color:rgba(255,255,255,.55);line-height:1.8">
+          The collaborative model uses <strong style="color:#22c55e">BPR ranking loss</strong> — it learns to place films a user loves <em>above</em> films they haven't seen, rather than guessing a star rating. Rating predictions (RMSE 0.7127) come from a separate SVD layer that outperforms the $1M Netflix Prize–winning algorithm by <strong style="color:#22c55e">16.8%</strong>.
         </p>
       </div>
+
     </div>
   </div>
 </section>
@@ -131,84 +142,84 @@
     <div class="aurora" style="width:400px;height:400px;background:rgba(168,85,247,.1);right:0;top:0"></div>
 
     <div class="reveal" style="margin-bottom:60px">
-      <div style="font-size:12px;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:#a855f7;margin-bottom:16px">The Journey</div>
+      <div style="font-size:12px;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:#a855f7;margin-bottom:16px">The Story</div>
       <h2 style="font-size:clamp(36px,5vw,60px);font-weight:800;letter-spacing:-.04em;line-height:1.05">0.005 → 0.2567<br/><span class="gp">A 5,034% improvement.</span></h2>
-      <p style="font-size:18px;color:rgba(255,255,255,.45);margin-top:16px;font-weight:300">20 tracked evaluation runs. Every decision logged. Every regression understood.</p>
+      <p style="font-size:18px;color:rgba(255,255,255,.45);margin-top:16px;font-weight:300">20 evaluation checkpoints. Every decision logged. Every regression understood.</p>
     </div>
 
     <!-- JOURNEY TIMELINE -->
     <div style="position:relative;padding-left:52px" class="reveal">
       <div class="timeline-line"></div>
 
-      <!-- Run 1 -->
+      <!-- Milestone 1 -->
       <div style="padding-bottom:44px;position:relative">
         <div class="tl-dot" style="position:absolute;left:-40px;top:4px;background:linear-gradient(135deg,#ef4444,#dc2626)"></div>
         <div style="display:flex;align-items:center;gap:12px;margin-bottom:8px">
-          <span style="font-size:13px;color:rgba(255,255,255,.3);font-weight:600">RUN #1</span>
-          <span style="padding:3px 10px;border-radius:980px;background:rgba(239,68,68,.15);color:#ef4444;font-size:11px;font-weight:600">Precision@10: 0.0050</span>
+          <span style="font-size:13px;color:rgba(255,255,255,.3);font-weight:600">STARTING POINT</span>
+          <span style="padding:3px 10px;border-radius:980px;background:rgba(239,68,68,.15);color:#ef4444;font-size:11px;font-weight:600">Precision@10: 0.005</span>
         </div>
-        <h4 style="font-size:18px;font-weight:700;margin-bottom:6px">Broken Baseline — Random Noise</h4>
-        <p style="font-size:14px;color:rgba(255,255,255,.45);line-height:1.7">SVD returned global average rating for 99.9% of users — it never saw them during training. Evaluation was picking random users from 138K, but the model only knew 700. Almost identical to random guessing.</p>
+        <h4 style="font-size:18px;font-weight:700;margin-bottom:6px">A Humble Beginning</h4>
+        <p style="font-size:14px;color:rgba(255,255,255,.45);line-height:1.7">The first model had a core flaw: it was evaluated against users it had never seen during training. With nearly no overlap between training and test users, recommendations were effectively random noise — a useful reminder that a model is only as good as the pipeline around it.</p>
       </div>
 
-      <!-- Run 2 -->
+      <!-- Milestone 2 -->
       <div style="padding-bottom:44px;position:relative">
         <div class="tl-dot" style="position:absolute;left:-40px;top:4px;background:linear-gradient(135deg,#f59e0b,#d97706)"></div>
         <div style="display:flex;align-items:center;gap:12px;margin-bottom:8px">
-          <span style="font-size:13px;color:rgba(255,255,255,.3);font-weight:600">RUN #2</span>
+          <span style="font-size:13px;color:rgba(255,255,255,.3);font-weight:600">FIRST BREAKTHROUGH</span>
           <span style="padding:3px 10px;border-radius:980px;background:rgba(34,197,94,.15);color:#22c55e;font-size:11px;font-weight:600">+1,400% ↑</span>
-          <span style="padding:3px 10px;border-radius:980px;background:rgba(245,158,11,.15);color:#f59e0b;font-size:11px;font-weight:600">0.0750</span>
+          <span style="padding:3px 10px;border-radius:980px;background:rgba(245,158,11,.15);color:#f59e0b;font-size:11px;font-weight:600">0.075</span>
         </div>
-        <h4 style="font-size:18px;font-weight:700;margin-bottom:6px">Fix the Foundation — Correct Evaluation</h4>
-        <p style="font-size:14px;color:rgba(255,255,255,.45);line-height:1.7">Switched from scikit-surprise (Python 3.14 incompatible) to scipy SVD. Fixed evaluation to only test users the model actually knows. Added standard Precision@K denominator. Overnight +1,400%.</p>
+        <h4 style="font-size:18px;font-weight:700;margin-bottom:6px">Getting the Foundations Right</h4>
+        <p style="font-size:14px;color:rgba(255,255,255,.45);line-height:1.7">Rebuilt the evaluation pipeline on scipy SVD, ensured the system only ran against users it had actually learned from, and applied proper Precision@K scoring. A single day of rigorous engineering produced a 1,400% jump — proof that measurement quality matters as much as model quality.</p>
       </div>
 
-      <!-- Run 5 -->
+      <!-- Milestone 3 -->
       <div style="padding-bottom:44px;position:relative">
         <div class="tl-dot" style="position:absolute;left:-40px;top:4px;background:linear-gradient(135deg,#f59e0b,#3b82f6)"></div>
         <div style="display:flex;align-items:center;gap:12px;margin-bottom:8px">
-          <span style="font-size:13px;color:rgba(255,255,255,.3);font-weight:600">RUN #5</span>
+          <span style="font-size:13px;color:rgba(255,255,255,.3);font-weight:600">DATA INSIGHT</span>
           <span style="padding:3px 10px;border-radius:980px;background:rgba(34,197,94,.15);color:#22c55e;font-size:11px;font-weight:600">+144% ↑</span>
-          <span style="padding:3px 10px;border-radius:980px;background:rgba(245,158,11,.15);color:#f59e0b;font-size:11px;font-weight:600">0.1833</span>
+          <span style="padding:3px 10px;border-radius:980px;background:rgba(245,158,11,.15);color:#f59e0b;font-size:11px;font-weight:600">0.183</span>
         </div>
-        <h4 style="font-size:18px;font-weight:700;margin-bottom:6px">Data Strategy — Train on Active Users</h4>
-        <p style="font-size:14px;color:rgba(255,255,255,.45);line-height:1.7">Stopped randomly sampling users. Selected top-12,000 by total rating count. More ratings per user = cleaner latent factors = better predictions. Single biggest improvement from data strategy alone.</p>
+        <h4 style="font-size:18px;font-weight:700;margin-bottom:6px">Smarter Data Strategy</h4>
+        <p style="font-size:14px;color:rgba(255,255,255,.45);line-height:1.7">Instead of sampling users at random, the model was trained exclusively on the 12,000 most active viewers in the dataset. Users with richer rating histories produce cleaner preference signals. This single data decision — no architecture change — delivered the largest single-step accuracy gain of the project.</p>
       </div>
 
-      <!-- Run 10 -->
+      <!-- Milestone 4 -->
       <div style="padding-bottom:44px;position:relative">
         <div class="tl-dot" style="position:absolute;left:-40px;top:4px;background:linear-gradient(135deg,#3b82f6,#06b6d4)"></div>
         <div style="display:flex;align-items:center;gap:12px;margin-bottom:8px">
-          <span style="font-size:13px;color:rgba(255,255,255,.3);font-weight:600">RUN #10</span>
+          <span style="font-size:13px;color:rgba(255,255,255,.3);font-weight:600">RICHER SIGNALS</span>
           <span style="padding:3px 10px;border-radius:980px;background:rgba(34,197,94,.15);color:#22c55e;font-size:11px;font-weight:600">+14% ↑</span>
-          <span style="padding:3px 10px;border-radius:980px;background:rgba(59,130,246,.15);color:#3b82f6;font-size:11px;font-weight:600">0.2100</span>
+          <span style="padding:3px 10px;border-radius:980px;background:rgba(59,130,246,.15);color:#3b82f6;font-size:11px;font-weight:600">0.210</span>
         </div>
-        <h4 style="font-size:18px;font-weight:700;margin-bottom:6px">TMDB Metadata — Rich Content Signal</h4>
-        <p style="font-size:14px;color:rgba(255,255,255,.45);line-height:1.7">Fetched overview, cast, director, and keywords for all 27K movies from TMDB API. Two-stage retrieval: genre similarity first, then rich-text re-ranking. Content went from 20 generic genre tags to full plot descriptions.</p>
+        <h4 style="font-size:18px;font-weight:700;margin-bottom:6px">TMDB Metadata Enrichment</h4>
+        <p style="font-size:14px;color:rgba(255,255,255,.45);line-height:1.7">Fetched full plot overviews, cast, director, and keywords for all 27,000 movies from the TMDB API. The content layer shifted from 20 bare genre labels to rich, expressive film descriptions. Two-stage retrieval — broad genre similarity first, then detailed re-ranking — made content recommendations meaningfully more relevant.</p>
       </div>
 
-      <!-- Run 16 -->
+      <!-- Milestone 5 -->
       <div style="padding-bottom:44px;position:relative">
         <div class="tl-dot" style="position:absolute;left:-40px;top:4px;background:linear-gradient(135deg,#a855f7,#3b82f6)"></div>
         <div style="display:flex;align-items:center;gap:12px;margin-bottom:8px">
-          <span style="font-size:13px;color:rgba(255,255,255,.3);font-weight:600">RUN #16</span>
+          <span style="font-size:13px;color:rgba(255,255,255,.3);font-weight:600">DEEP LEARNING</span>
           <span style="padding:3px 10px;border-radius:980px;background:rgba(34,197,94,.15);color:#22c55e;font-size:11px;font-weight:600">+19% ↑ · GOOD ✅</span>
-          <span style="padding:3px 10px;border-radius:980px;background:rgba(168,85,247,.15);color:#a855f7;font-size:11px;font-weight:600">0.2500</span>
+          <span style="padding:3px 10px;border-radius:980px;background:rgba(168,85,247,.15);color:#a855f7;font-size:11px;font-weight:600">0.250</span>
         </div>
-        <h4 style="font-size:18px;font-weight:700;margin-bottom:6px">Deep Learning — NCF/NeuMF + BPR Loss</h4>
-        <p style="font-size:14px;color:rgba(255,255,255,.45);line-height:1.7">Neural Collaborative Filtering (He et al. 2017 WWW Best Paper). GMF branch captures linear patterns; MLP captures non-linear taste. Trained with BPR pairwise ranking loss — directly optimises P@10. MPS-accelerated on Apple M5.</p>
+        <h4 style="font-size:18px;font-weight:700;margin-bottom:6px">Neural Collaborative Filtering</h4>
+        <p style="font-size:14px;color:rgba(255,255,255,.45);line-height:1.7">Added Neural Collaborative Filtering (NCF/NeuMF, He et al. 2017 WWW Best Paper). A GMF branch captures linear taste patterns; a deep MLP branch captures non-linear ones. Trained with BPR pairwise ranking loss — which directly optimises for top-10 ranking rather than rating accuracy. Accelerated on Apple M5 MPS hardware.</p>
       </div>
 
-      <!-- Run 20 -->
+      <!-- Milestone 6 -->
       <div style="position:relative">
         <div class="tl-dot" style="position:absolute;left:-40px;top:4px;background:linear-gradient(135deg,#22c55e,#06b6d4);box-shadow:0 0 30px rgba(34,197,94,.8)"></div>
         <div style="display:flex;align-items:center;gap:12px;margin-bottom:8px">
-          <span style="font-size:13px;color:rgba(255,255,255,.3);font-weight:600">RUN #20 — CURRENT BEST</span>
+          <span style="font-size:13px;color:rgba(255,255,255,.3);font-weight:600">CURRENT STATE</span>
           <span style="padding:3px 10px;border-radius:980px;background:rgba(34,197,94,.2);color:#22c55e;font-size:11px;font-weight:700;border:1px solid rgba(34,197,94,.4)">+5,034% total ↑</span>
           <span style="padding:3px 10px;border-radius:980px;background:rgba(34,197,94,.2);color:#22c55e;font-size:12px;font-weight:700;border:1px solid rgba(34,197,94,.4)">0.2567 GOOD ✅</span>
         </div>
         <h4 style="font-size:18px;font-weight:700;margin-bottom:6px">Sentence-BERT + NCF + iALS Ensemble</h4>
-        <p style="font-size:14px;color:rgba(255,255,255,.45);line-height:1.7">Replaced TF-IDF with Sentence-BERT (384-dim semantic embeddings on MPS). Ensemble: 0.55×NCF + 0.45×iALS rank fusion. SBERT understands "psychological thriller ≈ dark crime drama" — TF-IDF cannot. Exceeds published NCF SOTA benchmark.</p>
+        <p style="font-size:14px;color:rgba(255,255,255,.45);line-height:1.7">Replaced keyword matching with Sentence-BERT — 384-dimensional semantic embeddings that capture <em>meaning</em>, not just words. "Psychological thriller" and "dark crime drama" now map to neighbouring vectors. The collaborative side runs as a 0.55×NCF + 0.45×iALS rank fusion, where each model corrects the blind spots of the other. The result exceeds the published NCF benchmark.</p>
       </div>
     </div>
   </div>
@@ -226,37 +237,37 @@
       <!-- Precision -->
       <div class="metric-card glass2">
         <div style="font-size:40px;font-weight:800;letter-spacing:-.04em;background:linear-gradient(135deg,#22c55e,#06b6d4);-webkit-background-clip:text;-webkit-text-fill-color:transparent;margin-bottom:8px">0.2567</div>
-        <div style="font-size:16px;font-weight:700;margin-bottom:12px">Precision@10 ✅ GOOD</div>
-        <p style="font-size:14px;color:rgba(255,255,255,.5);line-height:1.7">Out of every 10 recommendations, <strong style="color:#22c55e">~2.5 are movies you'll genuinely love.</strong></p>
+        <div style="font-size:16px;font-weight:700;margin-bottom:12px">Precision@10 ✅</div>
+        <p style="font-size:14px;color:rgba(255,255,255,.5);line-height:1.7">Of 10 films surfaced from 27,278 candidates, <strong style="color:#22c55e">~2.5 sit in the user's independently verified favourites</strong> — films the model had never been told to suggest.</p>
         <div style="margin-top:16px;padding:12px;border-radius:10px;background:rgba(34,197,94,.07);border-left:3px solid #22c55e">
-          <span style="font-size:12px;color:rgba(255,255,255,.5)">5-year-old: "We suggested 10 movies. You liked 2.5 of them!"</span>
+          <span style="font-size:12px;color:rgba(255,255,255,.45);font-family:monospace">hits ∩ top-10 / 10</span>
         </div>
       </div>
       <!-- NDCG -->
       <div class="metric-card glass2">
         <div style="font-size:40px;font-weight:800;letter-spacing:-.04em;background:linear-gradient(135deg,#a855f7,#3b82f6);-webkit-background-clip:text;-webkit-text-fill-color:transparent;margin-bottom:8px">0.2698</div>
-        <div style="font-size:16px;font-weight:700;margin-bottom:12px">NDCG@10 ✅ GOOD</div>
-        <p style="font-size:14px;color:rgba(255,255,255,.5);line-height:1.7">The 2.5 hits appear <strong style="color:#a855f7">near the top of the list</strong>, not buried at position 9–10.</p>
+        <div style="font-size:16px;font-weight:700;margin-bottom:12px">NDCG@10 ✅</div>
+        <p style="font-size:14px;color:rgba(255,255,255,.5);line-height:1.7">Hits are position-weighted — a correct result at rank 1 scores <strong style="color:#a855f7">more than one at rank 9</strong>. High NDCG means the best matches rise to the very top of the list.</p>
         <div style="margin-top:16px;padding:12px;border-radius:10px;background:rgba(168,85,247,.07);border-left:3px solid #a855f7">
-          <span style="font-size:12px;color:rgba(255,255,255,.5)">5-year-old: "Your favourite candy is at the front, not the back!"</span>
+          <span style="font-size:12px;color:rgba(255,255,255,.45);font-family:monospace">DCG@10 / IDCG@10</span>
         </div>
       </div>
       <!-- Recall -->
       <div class="metric-card glass2">
         <div style="font-size:40px;font-weight:800;letter-spacing:-.04em;background:linear-gradient(135deg,#3b82f6,#06b6d4);-webkit-background-clip:text;-webkit-text-fill-color:transparent;margin-bottom:8px">0.0147</div>
         <div style="font-size:16px;font-weight:700;margin-bottom:12px">Recall@10</div>
-        <p style="font-size:14px;color:rgba(255,255,255,.5);line-height:1.7">We surface <strong style="color:#3b82f6">1.5% of your liked movies</strong> per query. Recall grows as K increases.</p>
+        <p style="font-size:14px;color:rgba(255,255,255,.5);line-height:1.7">A typical user has watched hundreds of great films. Each query surfaces <strong style="color:#3b82f6">~1.5% of their full favourites catalogue</strong> in just 10 results — recall scales naturally as K grows.</p>
         <div style="margin-top:16px;padding:12px;border-radius:10px;background:rgba(59,130,246,.07);border-left:3px solid #3b82f6">
-          <span style="font-size:12px;color:rgba(255,255,255,.5)">5-year-old: "You like 100 movies. We found 1–2 of them in our list of 10."</span>
+          <span style="font-size:12px;color:rgba(255,255,255,.45);font-family:monospace">hits ∩ top-10 / |relevant|</span>
         </div>
       </div>
       <!-- RMSE -->
       <div class="metric-card glass2">
         <div style="font-size:40px;font-weight:800;letter-spacing:-.04em;background:linear-gradient(135deg,#f59e0b,#22c55e);-webkit-background-clip:text;-webkit-text-fill-color:transparent;margin-bottom:8px">0.7127</div>
-        <div style="font-size:16px;font-weight:700;margin-bottom:12px">RMSE ✅ EXCELLENT</div>
-        <p style="font-size:14px;color:rgba(255,255,255,.5);line-height:1.7">Star rating predictions off by <strong style="color:#22c55e">±0.71 stars</strong> on a 1–5 scale. Netflix Prize winner was 0.8563.</p>
+        <div style="font-size:16px;font-weight:700;margin-bottom:12px">RMSE ✅ Excellent</div>
+        <p style="font-size:14px;color:rgba(255,255,255,.5);line-height:1.7">The SVD rating predictor deviates by just <strong style="color:#22c55e">±0.71 stars</strong> — lower than the 0.8563 achieved by the Netflix Prize–winning team in 2009. Clean accuracy, no tricks.</p>
         <div style="margin-top:16px;padding:12px;border-radius:10px;background:rgba(245,158,11,.07);border-left:3px solid #f59e0b">
-          <span style="font-size:12px;color:rgba(255,255,255,.5)">5-year-old: "We guessed 4 cookies. You wanted 4.7. We were off by 0.7 cookies."</span>
+          <span style="font-size:12px;color:rgba(255,255,255,.45);font-family:monospace">√(mean((ŷ − y)²))</span>
         </div>
       </div>
     </div>
@@ -269,14 +280,14 @@
     <div class="aurora" style="width:600px;height:400px;background:rgba(239,68,68,.08);left:-100px;top:0;animation-duration:9s"></div>
 
     <div class="reveal" style="text-align:center;margin-bottom:60px">
-      <div style="font-size:12px;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:#ef4444;margin-bottom:16px">Benchmark</div>
-      <h2 style="font-size:clamp(36px,5vw,60px);font-weight:800;letter-spacing:-.04em;line-height:1.05">Where we stand<br/><span style="background:linear-gradient(135deg,#ef4444,#f59e0b);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text">vs Netflix.</span></h2>
+      <div style="font-size:12px;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:#ef4444;margin-bottom:16px">Benchmarks</div>
+      <h2 style="font-size:clamp(36px,5vw,60px);font-weight:800;letter-spacing:-.04em;line-height:1.05">Where we stand<br/><span style="background:linear-gradient(135deg,#ef4444,#f59e0b);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text">against the field.</span></h2>
     </div>
 
     <!-- RMSE COMPARISON -->
     <div class="glass2 reveal" style="border-radius:28px;padding:48px;margin-bottom:32px">
       <h3 style="font-size:22px;font-weight:700;margin-bottom:8px">RMSE — Rating Prediction Accuracy</h3>
-      <p style="font-size:14px;color:rgba(255,255,255,.4);margin-bottom:32px">Lower = better. How precisely do we predict the star rating you would give?</p>
+      <p style="font-size:14px;color:rgba(255,255,255,.4);margin-bottom:32px">Lower is better. How precisely does the system predict the rating a user would give?</p>
 
       <div style="display:flex;flex-direction:column;gap:20px">
         <div>
@@ -309,14 +320,14 @@
       </div>
 
       <div style="margin-top:24px;padding:16px 20px;border-radius:14px;background:rgba(245,158,11,.08);border:1px solid rgba(245,158,11,.2)">
-        <p style="font-size:13px;color:rgba(255,255,255,.6)">⚠️ <strong style="color:#f59e0b">Important context:</strong> Netflix and MovieLens are different datasets. This comparison shows the <em>scale</em> of accuracy — we're not claiming to beat Netflix's production system. We beat the winning algorithm from their 2009 competition on our dataset.</p>
+        <p style="font-size:13px;color:rgba(255,255,255,.6)">⚠️ <strong style="color:#f59e0b">Context:</strong> Netflix and MovieLens are different datasets. This shows the <em>scale</em> of accuracy — we beat the winning algorithm from their 2009 competition on our dataset, not their current production system.</p>
       </div>
     </div>
 
     <!-- PRECISION COMPARISON -->
     <div class="glass2 reveal" style="border-radius:28px;padding:48px;margin-bottom:32px">
       <h3 style="font-size:22px;font-weight:700;margin-bottom:8px">Precision@10 — Ranking Quality</h3>
-      <p style="font-size:14px;color:rgba(255,255,255,.4);margin-bottom:24px">Higher = better. Of 10 recommendations, how many does the user actually like?</p>
+      <p style="font-size:14px;color:rgba(255,255,255,.4);margin-bottom:24px">Higher is better. Of 10 recommendations, how many does the user actually want to watch?</p>
 
       <div style="overflow-x:auto">
         <table style="width:100%;border-collapse:separate;border-spacing:0">
@@ -330,30 +341,30 @@
           </thead>
           <tbody>
             <tr class="compare-row"><td style="padding:14px 16px;font-size:14px;border-bottom:1px solid rgba(255,255,255,.04)">SVD Baseline</td><td style="padding:14px 16px;text-align:center;color:rgba(255,255,255,.4);border-bottom:1px solid rgba(255,255,255,.04)">~0.08</td><td style="padding:14px 16px;text-align:center;font-size:12px;color:rgba(255,255,255,.3);border-bottom:1px solid rgba(255,255,255,.04)">Full catalog</td><td style="padding:14px 16px;text-align:center;border-bottom:1px solid rgba(255,255,255,.04)"><span style="padding:3px 8px;border-radius:4px;background:rgba(239,68,68,.15);color:#ef4444;font-size:11px">WEAK</span></td></tr>
-            <tr class="compare-row"><td style="padding:14px 16px;font-size:14px;border-bottom:1px solid rgba(255,255,255,.04)">TF-IDF Hybrid (Our Run #6)</td><td style="padding:14px 16px;text-align:center;border-bottom:1px solid rgba(255,255,255,.04)">0.187</td><td style="padding:14px 16px;text-align:center;font-size:12px;color:rgba(255,255,255,.3);border-bottom:1px solid rgba(255,255,255,.04)">Full catalog</td><td style="padding:14px 16px;text-align:center;border-bottom:1px solid rgba(255,255,255,.04)"><span style="padding:3px 8px;border-radius:4px;background:rgba(245,158,11,.15);color:#f59e0b;font-size:11px">FAIR</span></td></tr>
+            <tr class="compare-row"><td style="padding:14px 16px;font-size:14px;border-bottom:1px solid rgba(255,255,255,.04)">TF-IDF Hybrid (v1 content layer)</td><td style="padding:14px 16px;text-align:center;border-bottom:1px solid rgba(255,255,255,.04)">0.187</td><td style="padding:14px 16px;text-align:center;font-size:12px;color:rgba(255,255,255,.3);border-bottom:1px solid rgba(255,255,255,.04)">Full catalog</td><td style="padding:14px 16px;text-align:center;border-bottom:1px solid rgba(255,255,255,.04)"><span style="padding:3px 8px;border-radius:4px;background:rgba(245,158,11,.15);color:#f59e0b;font-size:11px">FAIR</span></td></tr>
             <tr class="compare-row"><td style="padding:14px 16px;font-size:14px;border-bottom:1px solid rgba(255,255,255,.04)">BERT4Rec (2019, academic)</td><td style="padding:14px 16px;text-align:center;border-bottom:1px solid rgba(255,255,255,.04)">0.094</td><td style="padding:14px 16px;text-align:center;font-size:12px;color:rgba(255,255,255,.3);border-bottom:1px solid rgba(255,255,255,.04)">LOO / 100 negatives</td><td style="padding:14px 16px;text-align:center;border-bottom:1px solid rgba(255,255,255,.04)"><span style="padding:3px 8px;border-radius:4px;background:rgba(245,158,11,.15);color:#f59e0b;font-size:11px">LOO</span></td></tr>
             <tr class="compare-row"><td style="padding:14px 16px;font-size:14px;border-bottom:1px solid rgba(255,255,255,.04)">GRU4Rec (2023 SOTA)</td><td style="padding:14px 16px;text-align:center;border-bottom:1px solid rgba(255,255,255,.04)">0.095</td><td style="padding:14px 16px;text-align:center;font-size:12px;color:rgba(255,255,255,.3);border-bottom:1px solid rgba(255,255,255,.04)">LOO / 100 negatives</td><td style="padding:14px 16px;text-align:center;border-bottom:1px solid rgba(255,255,255,.04)"><span style="padding:3px 8px;border-radius:4px;background:rgba(168,85,247,.15);color:#a855f7;font-size:11px">SOTA</span></td></tr>
             <tr class="compare-row"><td style="padding:14px 16px;font-size:14px;border-bottom:1px solid rgba(255,255,255,.04)">NCF Benchmark (academic)</td><td style="padding:14px 16px;text-align:center;border-bottom:1px solid rgba(255,255,255,.04)">~0.250</td><td style="padding:14px 16px;text-align:center;font-size:12px;color:rgba(255,255,255,.3);border-bottom:1px solid rgba(255,255,255,.04)">Full catalog</td><td style="padding:14px 16px;text-align:center;border-bottom:1px solid rgba(255,255,255,.04)"><span style="padding:3px 8px;border-radius:4px;background:rgba(34,197,94,.15);color:#22c55e;font-size:11px">GOOD</span></td></tr>
-            <tr style="background:rgba(34,197,94,.05)"><td style="padding:16px 16px;font-size:15px;font-weight:700;color:#22c55e">🚀 Our System (Run #20)</td><td style="padding:16px 16px;text-align:center;font-size:16px;font-weight:800;color:#22c55e">0.2567</td><td style="padding:16px 16px;text-align:center;font-size:12px;color:rgba(255,255,255,.5)">Full catalog · 27K movies</td><td style="padding:16px 16px;text-align:center"><span style="padding:5px 12px;border-radius:4px;background:rgba(34,197,94,.2);color:#22c55e;font-size:12px;font-weight:700;border:1px solid rgba(34,197,94,.4)">GOOD ✅ EXCEEDS NCF SOTA</span></td></tr>
+            <tr style="background:rgba(34,197,94,.05)"><td style="padding:16px 16px;font-size:15px;font-weight:700;color:#22c55e">🚀 Our System</td><td style="padding:16px 16px;text-align:center;font-size:16px;font-weight:800;color:#22c55e">0.2567</td><td style="padding:16px 16px;text-align:center;font-size:12px;color:rgba(255,255,255,.5)">Full catalog · 27K movies</td><td style="padding:16px 16px;text-align:center"><span style="padding:5px 12px;border-radius:4px;background:rgba(34,197,94,.2);color:#22c55e;font-size:12px;font-weight:700;border:1px solid rgba(34,197,94,.4)">GOOD ✅ EXCEEDS NCF SOTA</span></td></tr>
           </tbody>
         </table>
       </div>
 
       <div style="margin-top:20px;padding:14px 18px;border-radius:12px;background:rgba(59,130,246,.08);border:1px solid rgba(59,130,246,.2)">
-        <p style="font-size:13px;color:rgba(255,255,255,.6)">📌 <strong style="color:#3b82f6">Evaluation note:</strong> Academic papers (BERT4Rec, GRU4Rec) use LOO — ranking 1 item among 100 random negatives. We rank 1 item against ALL 27,278 movies. Our harder protocol makes 0.2567 ≈ their 0.95 Hit Rate. The protocols are not directly comparable.</p>
+        <p style="font-size:13px;color:rgba(255,255,255,.6)">📌 <strong style="color:#3b82f6">Evaluation note:</strong> Academic papers (BERT4Rec, GRU4Rec) use LOO — ranking 1 item among 100 random negatives. We rank against all 27,278 movies. Our harder evaluation makes 0.2567 approximately equivalent to their 0.95 Hit Rate, but the protocols are not directly comparable.</p>
       </div>
     </div>
 
     <!-- WHAT'S DIFFERENT -->
     <div class="reveal" style="display:grid;grid-template-columns:1fr 1fr;gap:20px">
       <div class="glass" style="border-radius:20px;padding:32px;border-left:3px solid #ef4444">
-        <h4 style="font-size:16px;font-weight:700;margin-bottom:16px;color:#ef4444">🔒 Netflix (Closed)</h4>
+        <h4 style="font-size:16px;font-weight:700;margin-bottom:16px;color:#ef4444">🔒 Closed Systems</h4>
         <ul style="list-style:none;display:flex;flex-direction:column;gap:10px">
           <li style="font-size:14px;color:rgba(255,255,255,.5)">• Proprietary black box — not reusable</li>
           <li style="font-size:14px;color:rgba(255,255,255,.5)">• Billions in infrastructure costs</li>
-          <li style="font-size:14px;color:rgba(255,255,255,.5)">• No explainability</li>
-          <li style="font-size:14px;color:rgba(255,255,255,.5)">• Optimized for Netflix data only</li>
-          <li style="font-size:14px;color:rgba(255,255,255,.5)">• Deep A/B testing required</li>
+          <li style="font-size:14px;color:rgba(255,255,255,.5)">• No transparency or explainability</li>
+          <li style="font-size:14px;color:rgba(255,255,255,.5)">• Locked to a single platform</li>
+          <li style="font-size:14px;color:rgba(255,255,255,.5)">• Years of A/B testing to reach parity</li>
         </ul>
       </div>
       <div class="glass" style="border-radius:20px;padding:32px;border-left:3px solid #22c55e">
@@ -361,9 +372,9 @@
         <ul style="list-style:none;display:flex;flex-direction:column;gap:10px">
           <li style="font-size:14px;color:rgba(255,255,255,.6)">• Fully open-source, MIT licensed</li>
           <li style="font-size:14px;color:rgba(255,255,255,.6)">• Deploy in 30 minutes, free</li>
-          <li style="font-size:14px;color:rgba(255,255,255,.6)">• Every decision logged + documented</li>
-          <li style="font-size:14px;color:rgba(255,255,255,.6)">• Works on any movie/content dataset</li>
-          <li style="font-size:14px;color:rgba(255,255,255,.6)">• Beats their 2009 RMSE by 16.8%</li>
+          <li style="font-size:14px;color:rgba(255,255,255,.6)">• Every decision logged and documented</li>
+          <li style="font-size:14px;color:rgba(255,255,255,.6)">• Works on any movie or content dataset</li>
+          <li style="font-size:14px;color:rgba(255,255,255,.6)">• Beats the 2009 Netflix Prize RMSE by 16.8%</li>
         </ul>
       </div>
     </div>
@@ -375,152 +386,152 @@
   <div style="max-width:1100px;margin:0 auto">
     <div class="reveal" style="text-align:center;margin-bottom:60px">
       <div style="font-size:12px;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:#a855f7;margin-bottom:16px">Technology</div>
-      <h2 style="font-size:clamp(36px,5vw,60px);font-weight:800;letter-spacing:-.04em;line-height:1.05">Four algorithms.<br/><span class="gp">One perfect answer.</span></h2>
+      <h2 style="font-size:clamp(36px,5vw,60px);font-weight:800;letter-spacing:-.04em;line-height:1.05">Four algorithms.<br/><span class="gp">One recommendation.</span></h2>
     </div>
 
     <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:16px" class="reveal">
       <div class="glass2" style="border-radius:20px;padding:32px">
         <div style="font-size:32px;margin-bottom:16px">⚡</div>
         <h4 style="font-size:16px;font-weight:700;margin-bottom:8px;color:#06b6d4">iALS</h4>
-        <p style="font-size:13px;color:rgba(255,255,255,.5);line-height:1.7">Implicit Alternating Least Squares. Treats liked movies (≥4.0 stars) as high-confidence positive signals. Confidence = 1 + 40 × rating. Pushes loved movies to the top of rankings.</p>
+        <p style="font-size:13px;color:rgba(255,255,255,.5);line-height:1.7">Implicit Alternating Least Squares. Treats highly-rated movies as strong positive signals. Confidence scales with rating strength — films users loved get pushed to the very top of rankings.</p>
         <div style="margin-top:12px;font-size:11px;color:#06b6d4;font-weight:600">RANKING OPTIMIZED</div>
       </div>
       <div class="glass2" style="border-radius:20px;padding:32px">
         <div style="font-size:32px;margin-bottom:16px">🧠</div>
         <h4 style="font-size:16px;font-weight:700;margin-bottom:8px;color:#a855f7">NCF/NeuMF</h4>
-        <p style="font-size:13px;color:rgba(255,255,255,.5);line-height:1.7">Neural Collaborative Filtering. GMF branch (linear) + MLP branch (non-linear). Trained with BPR pairwise ranking loss. Runs on Apple M5 MPS — 35% faster than CPU.</p>
+        <p style="font-size:13px;color:rgba(255,255,255,.5);line-height:1.7">Neural Collaborative Filtering. A GMF branch captures linear taste patterns; an MLP branch captures non-linear ones. Trained with BPR pairwise ranking loss. Accelerated on Apple M5 MPS — 35% faster than CPU.</p>
         <div style="margin-top:12px;font-size:11px;color:#a855f7;font-weight:600">DEEP LEARNING · MPS</div>
       </div>
       <div class="glass2" style="border-radius:20px;padding:32px">
         <div style="font-size:32px;margin-bottom:16px">🔤</div>
         <h4 style="font-size:16px;font-weight:700;margin-bottom:8px;color:#3b82f6">Sentence-BERT</h4>
-        <p style="font-size:13px;color:rgba(255,255,255,.5);line-height:1.7">all-MiniLM-L6-v2. 384-dim semantic embeddings for all 27K movies. Understands meaning — "psychological thriller ≈ dark crime drama". Cached to disk after first encoding.</p>
+        <p style="font-size:13px;color:rgba(255,255,255,.5);line-height:1.7">all-MiniLM-L6-v2. 384-dim semantic embeddings for all 27K movies. Understands meaning — "psychological thriller ≈ dark crime drama". Encoded once at startup and cached to disk.</p>
         <div style="margin-top:12px;font-size:11px;color:#3b82f6;font-weight:600">SEMANTIC AI · TRANSFORMER</div>
       </div>
       <div class="glass2" style="border-radius:20px;padding:32px">
         <div style="font-size:32px;margin-bottom:16px">🔀</div>
         <h4 style="font-size:16px;font-weight:700;margin-bottom:8px;color:#22c55e">Ensemble Fusion</h4>
-        <p style="font-size:13px;color:rgba(255,255,255,.5);line-height:1.7">NCF + iALS rank fusion: 0.55×NCF + 0.45×iALS. Then hybrid: 0.70×collab + 0.30×SBERT content. Two models correct each other's errors — ensemble always beats either alone.</p>
+        <p style="font-size:13px;color:rgba(255,255,255,.5);line-height:1.7">NCF + iALS rank fusion (0.55×NCF + 0.45×iALS), then hybrid blending with SBERT content (0.70×collab + 0.30×content). Two models correct each other's blind spots — the ensemble consistently outperforms either alone.</p>
         <div style="margin-top:12px;font-size:11px;color:#22c55e;font-weight:600">ENSEMBLE · HYBRID</div>
       </div>
     </div>
   </div>
 </section>
 
-<!-- BUSINESS MODEL / AGILE -->
+<!-- HOW WE BUILT IT -->
 <section id="business" class="z2" style="padding:100px 48px;background:rgba(255,255,255,.01)">
   <div style="max-width:1100px;margin:0 auto">
     <div class="reveal" style="text-align:center;margin-bottom:60px">
-      <div style="font-size:12px;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:#f59e0b;margin-bottom:16px">Business Model · Agile Framework</div>
-      <h2 style="font-size:clamp(36px,5vw,60px);font-weight:800;letter-spacing:-.04em;line-height:1.05">Built sprint by sprint.<br/><span style="background:linear-gradient(135deg,#f59e0b,#ec4899);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text">Shipped for everyone.</span></h2>
+      <div style="font-size:12px;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:#f59e0b;margin-bottom:16px">Product Journey</div>
+      <h2 style="font-size:clamp(36px,5vw,60px);font-weight:800;letter-spacing:-.04em;line-height:1.05">Built iteration by iteration.<br/><span style="background:linear-gradient(135deg,#f59e0b,#ec4899);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text">Shipped for everyone.</span></h2>
     </div>
 
-    <!-- SPRINT CARDS -->
+    <!-- PHASE CARDS -->
     <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:16px;margin-bottom:60px" class="reveal">
-      <div class="sprint-card glass" style="border-color:#ef4444">
+      <div class="phase-card glass" style="border-color:#ef4444">
         <div style="display:flex;align-items:center;gap:12px;margin-bottom:16px">
-          <span style="padding:4px 12px;border-radius:4px;background:rgba(239,68,68,.15);color:#ef4444;font-size:11px;font-weight:700">SPRINT 1</span>
+          <span style="padding:4px 12px;border-radius:4px;background:rgba(239,68,68,.15);color:#ef4444;font-size:11px;font-weight:700">PHASE 1</span>
           <span style="font-size:13px;color:rgba(255,255,255,.4)">Foundation</span>
         </div>
         <h4 style="font-size:16px;font-weight:700;margin-bottom:8px">Build a Working System</h4>
         <ul style="list-style:none;display:flex;flex-direction:column;gap:6px">
-          <li style="font-size:13px;color:rgba(255,255,255,.5)">✅ SVD + TF-IDF hybrid</li>
-          <li style="font-size:13px;color:rgba(255,255,255,.5)">✅ Streamlit web app + TMDB API</li>
+          <li style="font-size:13px;color:rgba(255,255,255,.5)">✅ SVD + TF-IDF hybrid recommender</li>
+          <li style="font-size:13px;color:rgba(255,255,255,.5)">✅ Streamlit web app + TMDB poster API</li>
           <li style="font-size:13px;color:rgba(255,255,255,.5)">✅ Evaluation harness (P@K, R@K, NDCG)</li>
         </ul>
         <div style="margin-top:16px;font-size:13px;font-weight:600;color:#ef4444">P@10: 0.005 (baseline)</div>
       </div>
 
-      <div class="sprint-card glass" style="border-color:#f59e0b">
+      <div class="phase-card glass" style="border-color:#f59e0b">
         <div style="display:flex;align-items:center;gap:12px;margin-bottom:16px">
-          <span style="padding:4px 12px;border-radius:4px;background:rgba(245,158,11,.15);color:#f59e0b;font-size:11px;font-weight:700">SPRINT 2</span>
+          <span style="padding:4px 12px;border-radius:4px;background:rgba(245,158,11,.15);color:#f59e0b;font-size:11px;font-weight:700">PHASE 2</span>
           <span style="font-size:13px;color:rgba(255,255,255,.4)">Data Strategy</span>
         </div>
-        <h4 style="font-size:16px;font-weight:700;margin-bottom:8px">Fix the Foundation</h4>
+        <h4 style="font-size:16px;font-weight:700;margin-bottom:8px">Rigorous Evaluation</h4>
         <ul style="list-style:none;display:flex;flex-direction:column;gap:6px">
-          <li style="font-size:13px;color:rgba(255,255,255,.5)">✅ Fix evaluation user mismatch</li>
+          <li style="font-size:13px;color:rgba(255,255,255,.5)">✅ Fixed train/test user alignment</li>
           <li style="font-size:13px;color:rgba(255,255,255,.5)">✅ Active user selection strategy</li>
           <li style="font-size:13px;color:rgba(255,255,255,.5)">✅ User + item bias correction</li>
         </ul>
         <div style="margin-top:16px;font-size:13px;font-weight:600;color:#f59e0b">P@10: 0.183 (+3,560%)</div>
       </div>
 
-      <div class="sprint-card glass" style="border-color:#3b82f6">
+      <div class="phase-card glass" style="border-color:#3b82f6">
         <div style="display:flex;align-items:center;gap:12px;margin-bottom:16px">
-          <span style="padding:4px 12px;border-radius:4px;background:rgba(59,130,246,.15);color:#3b82f6;font-size:11px;font-weight:700">SPRINT 3</span>
+          <span style="padding:4px 12px;border-radius:4px;background:rgba(59,130,246,.15);color:#3b82f6;font-size:11px;font-weight:700">PHASE 3</span>
           <span style="font-size:13px;color:rgba(255,255,255,.4)">Content</span>
         </div>
         <h4 style="font-size:16px;font-weight:700;margin-bottom:8px">TMDB Metadata Enrichment</h4>
         <ul style="list-style:none;display:flex;flex-direction:column;gap:6px">
-          <li style="font-size:13px;color:rgba(255,255,255,.5)">✅ Fetch overview + cast + director</li>
+          <li style="font-size:13px;color:rgba(255,255,255,.5)">✅ Fetched overview, cast, director</li>
           <li style="font-size:13px;color:rgba(255,255,255,.5)">✅ Two-stage retrieval pipeline</li>
           <li style="font-size:13px;color:rgba(255,255,255,.5)">✅ Cosine similarity graded scores</li>
         </ul>
         <div style="margin-top:16px;font-size:13px;font-weight:600;color:#3b82f6">P@10: 0.210 (+12%)</div>
       </div>
 
-      <div class="sprint-card glass" style="border-color:#a855f7">
+      <div class="phase-card glass" style="border-color:#a855f7">
         <div style="display:flex;align-items:center;gap:12px;margin-bottom:16px">
-          <span style="padding:4px 12px;border-radius:4px;background:rgba(168,85,247,.15);color:#a855f7;font-size:11px;font-weight:700">SPRINT 4</span>
+          <span style="padding:4px 12px;border-radius:4px;background:rgba(168,85,247,.15);color:#a855f7;font-size:11px;font-weight:700">PHASE 4</span>
           <span style="font-size:13px;color:rgba(255,255,255,.4)">Deep Learning</span>
         </div>
         <h4 style="font-size:16px;font-weight:700;margin-bottom:8px">NCF + BPR + MPS</h4>
         <ul style="list-style:none;display:flex;flex-direction:column;gap:6px">
           <li style="font-size:13px;color:rgba(255,255,255,.5)">✅ iALS ranking-optimized model</li>
           <li style="font-size:13px;color:rgba(255,255,255,.5)">✅ NCF/NeuMF on Apple M5 MPS</li>
-          <li style="font-size:13px;color:rgba(255,255,255,.5)">✅ NCF + iALS ensemble</li>
+          <li style="font-size:13px;color:rgba(255,255,255,.5)">✅ NCF + iALS ensemble fusion</li>
         </ul>
         <div style="margin-top:16px;font-size:13px;font-weight:600;color:#a855f7">P@10: 0.250 (GOOD ✅)</div>
       </div>
 
-      <div class="sprint-card glass" style="border-color:#22c55e">
+      <div class="phase-card glass" style="border-color:#22c55e">
         <div style="display:flex;align-items:center;gap:12px;margin-bottom:16px">
-          <span style="padding:4px 12px;border-radius:4px;background:rgba(34,197,94,.15);color:#22c55e;font-size:11px;font-weight:700">SPRINT 5</span>
+          <span style="padding:4px 12px;border-radius:4px;background:rgba(34,197,94,.15);color:#22c55e;font-size:11px;font-weight:700">PHASE 5 — CURRENT</span>
           <span style="font-size:13px;color:rgba(255,255,255,.4)">Semantic AI</span>
         </div>
-        <h4 style="font-size:16px;font-weight:700;margin-bottom:8px">Sentence-BERT Upgrade</h4>
+        <h4 style="font-size:16px;font-weight:700;margin-bottom:8px">Sentence-BERT Content Layer</h4>
         <ul style="list-style:none;display:flex;flex-direction:column;gap:6px">
-          <li style="font-size:13px;color:rgba(255,255,255,.5)">✅ SBERT replaces TF-IDF</li>
+          <li style="font-size:13px;color:rgba(255,255,255,.5)">✅ SBERT replaces keyword matching</li>
           <li style="font-size:13px;color:rgba(255,255,255,.5)">✅ 384-dim semantic embeddings</li>
-          <li style="font-size:13px;color:rgba(255,255,255,.5)">✅ Cached to disk, MPS-encoded</li>
+          <li style="font-size:13px;color:rgba(255,255,255,.5)">✅ Disk-cached, MPS-accelerated</li>
         </ul>
         <div style="margin-top:16px;font-size:13px;font-weight:600;color:#22c55e">P@10: 0.2567 (exceeds NCF SOTA)</div>
       </div>
 
-      <div class="sprint-card glass" style="border-color:rgba(255,255,255,.1)">
+      <div class="phase-card glass" style="border-color:rgba(255,255,255,.1)">
         <div style="display:flex;align-items:center;gap:12px;margin-bottom:16px">
-          <span style="padding:4px 12px;border-radius:4px;background:rgba(255,255,255,.08);color:rgba(255,255,255,.5);font-size:11px;font-weight:700">SPRINT 6+</span>
-          <span style="font-size:13px;color:rgba(255,255,255,.4)">Backlog</span>
+          <span style="padding:4px 12px;border-radius:4px;background:rgba(255,255,255,.08);color:rgba(255,255,255,.5);font-size:11px;font-weight:700">WHAT'S NEXT</span>
+          <span style="font-size:13px;color:rgba(255,255,255,.4)">Roadmap</span>
         </div>
-        <h4 style="font-size:16px;font-weight:700;margin-bottom:8px">Roadmap to EXCELLENT</h4>
+        <h4 style="font-size:16px;font-weight:700;margin-bottom:8px">Pushing Further</h4>
         <div style="display:flex;flex-direction:column;gap:8px">
-          <div class="roadmap-item"><div style="width:8px;height:8px;border-radius:50%;background:#ef4444;flex-shrink:0"></div><span style="font-size:13px;color:rgba(255,255,255,.6)">LightGCN — graph convolution</span></div>
-          <div class="roadmap-item"><div style="width:8px;height:8px;border-radius:50%;background:#f59e0b;flex-shrink:0"></div><span style="font-size:13px;color:rgba(255,255,255,.6)">SASRec — self-attention SOTA</span></div>
-          <div class="roadmap-item"><div style="width:8px;height:8px;border-radius:50%;background:#3b82f6;flex-shrink:0"></div><span style="font-size:13px;color:rgba(255,255,255,.6)">Explainability module</span></div>
+          <div class="roadmap-item"><div style="width:8px;height:8px;border-radius:50%;background:#ef4444;flex-shrink:0"></div><span style="font-size:13px;color:rgba(255,255,255,.6)">LightGCN — graph convolution over user-item graph</span></div>
+          <div class="roadmap-item"><div style="width:8px;height:8px;border-radius:50%;background:#f59e0b;flex-shrink:0"></div><span style="font-size:13px;color:rgba(255,255,255,.6)">SASRec — self-attention sequential recommendations</span></div>
+          <div class="roadmap-item"><div style="width:8px;height:8px;border-radius:50%;background:#3b82f6;flex-shrink:0"></div><span style="font-size:13px;color:rgba(255,255,255,.6)">Explainability — why this film was recommended</span></div>
         </div>
       </div>
     </div>
 
     <!-- BUSINESS VALUE -->
     <div class="glass2 reveal" style="border-radius:28px;padding:48px">
-      <h3 style="font-size:22px;font-weight:700;margin-bottom:8px">Why It Matters — Business Value</h3>
-      <p style="font-size:14px;color:rgba(255,255,255,.4);margin-bottom:32px">The $330B streaming market is dominated by recommendation engines. We open-source the access.</p>
+      <h3 style="font-size:22px;font-weight:700;margin-bottom:8px">Why It Matters</h3>
+      <p style="font-size:14px;color:rgba(255,255,255,.4);margin-bottom:32px">The $330B streaming market runs on recommendation engines. We open-source the access.</p>
       <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:20px">
         <div style="text-align:center;padding:24px;border-radius:16px;background:rgba(168,85,247,.06);border:1px solid rgba(168,85,247,.15)">
           <div style="font-size:36px;font-weight:800;letter-spacing:-.04em;color:#a855f7;margin-bottom:8px">80%</div>
-          <div style="font-size:13px;color:rgba(255,255,255,.5)">Netflix content watched via recommendation engine</div>
+          <div style="font-size:13px;color:rgba(255,255,255,.5)">of Netflix content is discovered through its recommendation engine</div>
         </div>
         <div style="text-align:center;padding:24px;border-radius:16px;background:rgba(59,130,246,.06);border:1px solid rgba(59,130,246,.15)">
           <div style="font-size:36px;font-weight:800;letter-spacing:-.04em;color:#3b82f6;margin-bottom:8px">35%</div>
-          <div style="font-size:13px;color:rgba(255,255,255,.5)">Amazon revenue attributed to recommendation systems</div>
+          <div style="font-size:13px;color:rgba(255,255,255,.5)">of Amazon revenue is attributed to recommendation systems</div>
         </div>
         <div style="text-align:center;padding:24px;border-radius:16px;background:rgba(34,197,94,.06);border:1px solid rgba(34,197,94,.15)">
           <div style="font-size:36px;font-weight:800;letter-spacing:-.04em;color:#22c55e;margin-bottom:8px">$0</div>
-          <div style="font-size:13px;color:rgba(255,255,255,.5)">Cost to deploy our system vs $1M+ for Netflix-grade infra</div>
+          <div style="font-size:13px;color:rgba(255,255,255,.5)">to deploy our system, versus $1M+ for equivalent closed infrastructure</div>
         </div>
         <div style="text-align:center;padding:24px;border-radius:16px;background:rgba(245,158,11,.06);border:1px solid rgba(245,158,11,.15)">
           <div style="font-size:36px;font-weight:800;letter-spacing:-.04em;color:#f59e0b;margin-bottom:8px">30m</div>
-          <div style="font-size:13px;color:rgba(255,255,255,.5)">Time to deploy on any cloud or local server</div>
+          <div style="font-size:13px;color:rgba(255,255,255,.5)">to deploy on any cloud provider or local server</div>
         </div>
       </div>
     </div>

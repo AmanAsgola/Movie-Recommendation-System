@@ -1,6 +1,9 @@
+import os
 import streamlit as st
 import pandas as pd
 import requests
+
+_DATA_DIR = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "data")
 
 from content_based import ContentBasedRecommender
 from collaborative import CollaborativeRecommender
@@ -36,7 +39,7 @@ def fetch_poster(movie_name):
 # -----------------------------
 @st.cache_resource
 def load_models():
-    movies = pd.read_csv("data/movies.csv")
+    movies = pd.read_csv(os.path.join(_DATA_DIR, "movies.csv"))
 
     content_model = ContentBasedRecommender()
     collab_model = CollaborativeRecommender()
