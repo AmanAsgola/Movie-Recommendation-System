@@ -174,5 +174,24 @@
       "recall_pct": 39.57,
       "ndcg_pct": 39.46
     }
+  },
+  {
+    "run": 11,
+    "timestamp": "2026-05-08 11:57:41",
+    "commit": "f268840",
+    "changes": "Add TMDB metadata enrichment and two-stage content retrieval",
+    "users_evaluated": 30,
+    "scores": {
+      "precision_at_10": 0.1933,
+      "recall_at_10": 0.0115,
+      "ndcg_at_10": 0.208,
+      "rmse": 0.7127
+    },
+    "improvement_vs_previous": {
+      "precision_pct": -7.94,
+      "recall_pct": -8.6,
+      "ndcg_pct": -5.82,
+      "rmse_pct": null
+    }
   }
 ]
