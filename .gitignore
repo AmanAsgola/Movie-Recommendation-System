@@ -20,10 +20,12 @@ ENV/
 .ipynb_checkpoints/
 *.ipynb_checkpoints
 
-# Data files (large — download separately via MovieLens)
+# Data files (large — download separately via MovieLens / fetch_metadata.py)
 data/ratings.csv
 data/links.csv
 data/tags.csv
+data/movies_metadata.csv
+data/priority_movieids.csv
 
 # macOS
 .DS_Store
